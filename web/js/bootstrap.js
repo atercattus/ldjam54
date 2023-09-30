@@ -12,14 +12,32 @@ class Game {
             autoResize: true,
             resolution: (window.devicePixelRatio || 1),
         });
-        this.app.renderer.backgroundColor = 0;//0x84CCFF;
+        this.app.renderer.backgroundColor = 0;
 
         document.body.appendChild(this.app.view);
 
         this.app.renderer.view.style.position = 'absolute';
         this.app.renderer.view.style.display = 'block';
 
-        this.app.stage.sortableChildren = true; // для работы zIndex
+        //this.app.stage.sortableChildren = true; // for zIndex
+    }
+
+    buildFogOfWar(pos, parent) {
+        const half = 256; // half of texture size
+        let gradient = PIXI.Sprite.from('assets/gradient.png');
+        gradient.anchor.set(0.5);
+        gradient.x = pos.x;
+        gradient.y = pos.y;
+        this.app.stage.addChild(gradient);
+
+        let gradBorders = new PIXI.Graphics();
+        gradBorders.beginFill(0);
+        gradBorders.drawRect(0, 0, gradient.x - half, window.innerHeight);
+        gradBorders.drawRect(gradient.x + half, 0, window.innerWidth, window.innerHeight);
+        gradBorders.drawRect(0, 0, window.innerWidth, gradient.y - half);
+        gradBorders.drawRect(0, gradient.y + half, window.innerWidth, window.innerHeight);
+
+        parent.addChild(gradBorders);
     }
 }
 
@@ -47,37 +65,18 @@ map.build(containerMap);
 containerMap.x = (window.innerWidth - containerMap.width) / 2;
 containerMap.y = (window.innerHeight - containerMap.height) / 2;
 
-let cir = new PIXI.Graphics();
-cir.beginFill(0xffffff);
-cir.drawCircle(0, 0, 12);
-containerMap.addChild(cir);
-let player = new Player(new Pos(map.map.start.x, map.map.start.y), map, cir);
+let player = new Player(new Pos(map.map.start.x, map.map.start.y), map, containerMap);
 
+//let thing = new Thing(new Pos(10, 30), map, cir2);
+let thing = new Thing(new Pos(13, 6), map, containerMap);
 
-let cir2 = new PIXI.Graphics();
-cir2.beginFill(0xff0033);
-cir2.drawCircle(0, 0, 12);
-containerMap.addChild(cir2);
-let thing = new Thing(new Pos(5, 15), map, cir2);
-
-// gradient filler
-let gradient = PIXI.Sprite.from('assets/gradient.png');
-gradient.anchor.set(0.5);
-//gradient.scale.x = 0.7;
-//gradient.scale.y = 0.7;
-gradient.x = cir.x + containerMap.x; //window.innerWidth / 2;
-gradient.y = cir.y + containerMap.y; //window.innerHeight / 2;
-game.app.stage.addChild(gradient);
-
-let gradBorders = new PIXI.Graphics();
-gradBorders.beginFill(0);
-gradBorders.drawRect(0, 0, gradient.x - 256, window.innerHeight);
-gradBorders.drawRect(gradient.x + 256, 0, window.innerWidth, window.innerHeight);
-gradBorders.drawRect(0, 0, window.innerWidth, gradient.y - 256);
-gradBorders.drawRect(0, gradient.y + 256, window.innerWidth, window.innerHeight);
-
-game.app.stage.addChild(gradBorders);
-
+game.buildFogOfWar(
+    new Pos(
+        map.idx2X(map.map.start.x) + containerMap.x,
+        map.idx2Y(map.map.start.y) + containerMap.y,
+    ),
+    game.app.stage
+);
 
 document.addEventListener('keydown', (key) => {
     switch (key.code) {
@@ -94,4 +93,10 @@ document.addEventListener('keydown', (key) => {
             player.moveBy(0, 1);
             break;
     }
+});
+
+game.app.ticker.add(() => {
+    const delta = game.app.ticker.elapsedMS / 1000;
+    player.update(delta);
+    map.update(delta);
 });

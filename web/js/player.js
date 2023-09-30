@@ -1,9 +1,16 @@
 class Player extends Obj {
     visibleDistance = 6;
 
-    isMoving = false;
+    movingTo;
+    movingSpeed;
+    movingDuration;
 
-    constructor(pos, map, image) {
+    constructor(pos, map, parent) {
+        let image = new PIXI.Graphics();
+        image.beginFill(0xffffff);
+        image.drawCircle(0, 0, 12);
+        parent.addChild(image);
+
         super(pos, map, image);
 
         map.hideAllCells();
@@ -11,7 +18,7 @@ class Player extends Obj {
     }
 
     moveBy(dx, dy) {
-        if (this.isMoving) {
+        if (this.movingTo) {
             return;
         }
 
@@ -22,30 +29,32 @@ class Player extends Obj {
             return;
         }
 
-        this.isMoving = true;
-
-        let interval_ms = 300;
+        this.movingTo = new Pos(newX, newY);
+        this.movingDuration = 0.25;
         if (dx === 0 && dy !== 0) {
-            interval_ms /= 1.2;
+            this.movingDuration /= 1.6;
         }
-        const iters = interval_ms / 16;
-        const animDx = dx / iters;
-        const animDy = dy / iters;
-        let iter = 0;
-        const timer = setInterval(() => {
-            super.moveBy(animDx, animDy);
+        this.movingSpeed = new Pos(dx * this.movingDuration, dy * this.movingDuration);
+    }
 
-            this.image.parent.x -= animDx * this.map.CellW;
-            this.image.parent.y -= animDy * this.map.CellH;
+    update(delta) {
+        if (!this.movingTo) {
+            return;
+        }
+        this.movingDuration -= delta;
+        if (this.movingDuration <= 0) {
+            this.moveTo(this.movingTo.x, this.movingTo.y);
+            map.showNear(this.pos, this.visibleDistance);
+            this.movingTo = undefined;
+            return;
+        }
 
-            if (++iter >= iters) {
-                clearInterval(timer);
+        const dx = this.movingSpeed.x ? (delta / this.movingSpeed.x) : 0;
+        const dy = this.movingSpeed.y ? (delta / this.movingSpeed.y) : 0;
 
-                this.moveTo(newX, newY);
-                map.showNear(this.pos, this.visibleDistance);
+        super.moveBy(dx, dy);
 
-                this.isMoving = false;
-            }
-        }, 16);
+        this.image.parent.x -= dx * this.map.CellW;
+        this.image.parent.y -= dy * this.map.CellH;
     }
 }

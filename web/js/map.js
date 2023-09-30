@@ -1,3 +1,9 @@
+class Cell extends PIXI.Sprite {
+    constructor(tex) {
+        super(tex);
+    }
+}
+
 class Map {
     CellW = 64;
     CellH = 32;
@@ -8,8 +14,11 @@ class Map {
     goldSprites;
 
     map = {};
+    container;
 
     sprites = [];
+
+    golds = [];
 
     visibleCells = [];
 
@@ -22,32 +31,59 @@ class Map {
 
     gen() {
         const map = [
-            [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0],
-            [0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0],
-            [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-            [0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1],
-            [1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0],
-            [1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0],
-            [1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0],
-            [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0],
-            [1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-            [0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0],
-            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,],
+            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,],
+            [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
+            [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
+            [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,],
+            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,],
         ];
+
         return {
             map: map,
             rows: map.length,
             cols: map[0].length,
-            start: {x: 6, y: 5}, // counts from 1
+            start: {x: 12, y: 10}, // counts from 1
         };
+    }
+
+    makeMapSprite(tex, x, y) {
+        let sprite = new Cell(tex);
+        sprite.anchorX = 0;
+        sprite.anchorY = 0;
+        this.sprites[y][x] = sprite;
+        this.container.addChild(sprite);
+
+        return sprite;
     }
 
     build(container) {
         this.map = this.gen();
+        this.container = container;
 
         const scheme = this.map.map;
         const rows = this.map.rows;
@@ -60,38 +96,22 @@ class Map {
 
         // top & bottom borders
         for (let x = 0; x <= cols + 1; x++) {
-            let sprite = new PIXI.Sprite(this.topSprite);
+            let sprite = this.makeMapSprite(this.topSprite, x, 0);
             sprite.x = x * this.CellW;
-            sprite.anchorX = 0;
-            sprite.anchorY = 0;
-            container.addChild(sprite);
-            this.sprites[0][x] = sprite;
 
-            sprite = new PIXI.Sprite(this.topSprite);
+            sprite = this.makeMapSprite(this.topSprite, x, rows + 1);
             sprite.x = x * this.CellW;
             sprite.y = (rows + 1) * this.CellH;
-            sprite.anchorX = 0;
-            sprite.anchorY = 0;
-            container.addChild(sprite);
-            this.sprites[rows + 1][x] = sprite;
         }
 
         // left & right borders
         for (let y = 1; y <= rows; y++) {
-            let sprite = new PIXI.Sprite(this.topSprite);
+            let sprite = this.makeMapSprite(this.topSprite, 0, y);
             sprite.y = y * this.CellH;
-            sprite.anchorX = 0;
-            sprite.anchorY = 0;
-            container.addChild(sprite);
-            this.sprites[y][0] = sprite;
 
-            sprite = new PIXI.Sprite(this.topSprite);
+            sprite = this.makeMapSprite(this.topSprite, cols + 1, y);
             sprite.x = (cols + 1) * this.CellW;
             sprite.y = y * this.CellH;
-            sprite.anchorX = 0;
-            sprite.anchorY = 0;
-            container.addChild(sprite);
-            this.sprites[y][cols + 1] = sprite;
         }
 
         // map
@@ -108,24 +128,19 @@ class Map {
                     tex = this.groundSprite;
                 }
 
-                const sprite = new PIXI.Sprite(tex);
+                const sprite = this.makeMapSprite(tex, x + 1, y + 1);
                 sprite.x = (x + 1) * this.CellW;
                 sprite.y = (y + 1) * this.CellH;
-
-                container.addChild(sprite);
-                this.sprites[y + 1][x + 1] = sprite;
 
                 if (tex === this.groundSprite) {
                     if (Math.random() < 0.1) {
                         const gi = Math.floor(Math.random() * this.goldSprites.length);
                         const gold = new PIXI.Sprite(this.goldSprites[gi]);
-                        gold.x = sprite.x;
-                        gold.y = sprite.y;
+                        gold.x = 10;
                         gold.scale.x = 0.6;
                         gold.scale.y = 0.6;
-                        container.addChild(gold);
-
-                        sprite.__goldSprite = gold;
+                        sprite.addChild(gold);
+                        this.golds.push(gold);
                     }
                 }
             }
@@ -206,18 +221,10 @@ class Map {
     showCell(sprite) {
         sprite.visible = true;
         this.visibleCells.push(sprite);
-
-        if (sprite.__goldSprite) {
-            sprite.__goldSprite.visible = true;
-        }
     }
 
     hideCell(sprite) {
         sprite.visible = false;
-
-        if (sprite.__goldSprite) {
-            sprite.__goldSprite.visible = false;
-        }
     }
 
     showNear(pos, distance) {
@@ -272,5 +279,8 @@ class Map {
 
             this.showCell(this.sprites[p.pos.y][p.pos.x]);
         }
+    }
+
+    update(delta) {
     }
 }
