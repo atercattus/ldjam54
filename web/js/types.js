@@ -6,6 +6,8 @@ const TypeDreamer = 3;
 const TypeNormal = 4;
 const TypeAggressive = 5;
 
+const TypeGold = 6;
+
 class Pos {
     x;
     y;
@@ -44,6 +46,13 @@ class Obj {
         this.pos.x = x;
         this.pos.y = y;
         this.moveImageToPos();
+    }
+
+    getCellCoords() {
+        return new Pos(
+            Math.floor(this.pos.x),
+            Math.floor(this.pos.y)
+        );
     }
 }
 

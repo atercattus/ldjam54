@@ -25,6 +25,8 @@ class Thing extends Obj {
     gotoPos;
     moveTimer;
 
+    dreamerWakeupInterval = undefined;
+
     constructor(type, pos, map, parent, playerPosFunc) {
         let color = Colors[type];
         let radius = Radiuses[type];
@@ -61,6 +63,16 @@ class Thing extends Obj {
             return;
         }
 
+        if (this.dreamerWakeupInterval > 0) {
+            if (--this.dreamerWakeupInterval <= 0) {
+                // angry mode :)
+                //console.log('dreamer is here!');
+                //this.dreamerWakeupInterval = undefined;
+
+                this.viewDistance = ViewDistances[TypeNormal];
+            }
+        }
+
         const playerPos = this.playerPosFunc();
         const dist = distance(this.pos, playerPos);
         const see = (dist <= this.viewDistance) && map.canSee(playerPos, this.pos);
@@ -75,24 +87,30 @@ class Thing extends Obj {
         } else if (see) {
             //console.log('see!');
             if (this.type === TypeDreamer) {
-                // angry mode :)
-                this.type = TypeNormal;
-                this.viewDistance = ViewDistances[this.type];
-                this.viewDistance = ViewDistances[this.type];
+                if (this.dreamerWakeupInterval === undefined) {
+                    //console.log('dreamer wake up...');
+                    this.dreamerWakeupInterval = 1;
+                    return;
+                }
             }
             this.inSearch = true;
             this.gotoPos = playerPos;
         } else {
             if (!this.gotoPos) {
+                if ((this.type === TypeDreamer) && (this.dreamerWakeupInterval !== undefined)) {
+                    //console.log('dreamer calm down...');
+                    this.viewDistance = ViewDistances[TypeDreamer];
+                    this.dreamerWakeupInterval = undefined;
+                    return;
+                }
+
                 this.moveToRandom(delta);
                 return;
             }
         }
 
         if (this.gotoPos) {
-            //if (Math.random() > 0.95) { // skip a move sometimes
             this.moveToTarget(delta);
-            //}
         }
     }
 
@@ -192,5 +210,16 @@ class Things {
         for (let i = 0; i < this.things.length; i++) {
             this.things[i].update(delta, playerDidStep);
         }
+    }
+
+    getByCoords(pos) {
+        for (let i = 0; i < this.things.length; i++) {
+            const thing = this.things[i];
+            const thingPos = thing.getCellCoords()
+            if ((pos.x === thingPos.x) && (pos.y === thingPos.y)) {
+                return thing;
+            }
+        }
+        return undefined;
     }
 }

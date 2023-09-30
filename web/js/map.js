@@ -48,6 +48,7 @@ class Map {
 
     gen() {
         const P = TypePlayer;
+        const G = TypeGold;
         const D = TypeDreamer;
         const A = TypeAggressive;
         const N = TypeNormal;
@@ -56,14 +57,14 @@ class Map {
             [1, P, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,],
             [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, D, 0,],
             [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,],
-            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, D, 1, 1, 0,],
-            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, N, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,],
-            [D, D, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
-            [D, D, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
-            [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
-            [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
-            [0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
-            [0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, D, 1, G, 0,],
+            [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, N, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,],
+            [G, D, D, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
+            [G, D, D, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
+            [0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
+            [0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
             [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
             [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
             [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0,],
@@ -160,29 +161,37 @@ class Map {
 
                         const chess = new PIXI.Sprite(this.chessTex);
                         sprite.addChild(chess);
-
                         break;
+
                     case TypeDreamer:
                     case TypeNormal:
                     case TypeAggressive:
                         this.things.add(new Pos(x + 1, y + 1), type);
                         break;
+
+                    case TypeGold:
+                        this.addGold(sprite);
+                        break;
                 }
 
                 if (type === TypeEmpty) {
                     if (Math.random() < 0.1) {
-                        const gi = Math.floor(Math.random() * this.goldTextures.length);
-                        const gold = new PIXI.Sprite(this.goldTextures[gi]);
-                        gold.x = 10;
-                        gold.scale.x = 0.6;
-                        gold.scale.y = 0.6;
-                        sprite.addChild(gold);
-                        sprite.__gold = gold;
-                        this.goldTotal++;
+                        this.addGold(sprite);
                     }
                 }
             }
         }
+    }
+
+    addGold(groundSprite) {
+        const gi = Math.floor(Math.random() * this.goldTextures.length);
+        const gold = new PIXI.Sprite(this.goldTextures[gi]);
+        gold.x = 10;
+        gold.scale.x = 0.6;
+        gold.scale.y = 0.6;
+        groundSprite.addChild(gold);
+        groundSprite.__gold = gold;
+        this.goldTotal++;
     }
 
     idx2X(x) {
@@ -337,6 +346,10 @@ class Map {
 
             this.showCell(this.sprites[p.pos.y][p.pos.x]);
         }
+    }
+
+    getThingByCoords(pos) {
+        return this.things.getByCoords(pos);
     }
 
     update(delta, playerDidStep) {

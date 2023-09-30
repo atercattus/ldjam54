@@ -66,13 +66,6 @@ class Player extends Obj {
         this.image.parent.y -= dy * this.map.CellH;
     }
 
-    getCellCoords() {
-        return new Pos(
-            Math.floor(this.pos.x),
-            Math.floor(this.pos.y)
-        );
-    }
-
     processNewCell() {
         const sprite = this.map.sprites[this.pos.y][this.pos.x];
         const gold = sprite.__gold;
@@ -92,6 +85,27 @@ class Player extends Obj {
                 this.setScoreText();
             }
         }
+
+        const thing = this.map.getThingByCoords(this.getCellCoords());
+        if (thing && (thing.type !== TypeDreamer)) {
+            console.log(thing.type, thing.pos);
+            this.catched();
+        }
+    }
+
+    catched() {
+        this.goldInv = 0;
+        const startPos = this.map.map.start;
+        const dx = this.pos.x - startPos.x;
+        const dy = this.pos.y - startPos.y;
+
+        this.moveTo(startPos.x, startPos.y);
+
+        this.image.parent.x += dx * this.map.CellW;
+        this.image.parent.y += dy * this.map.CellH;
+
+        map.hideAllCells();
+        map.showNear(this.pos, this.viewDistance);
     }
 
     setScoreText() {
