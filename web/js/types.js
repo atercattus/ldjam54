@@ -20,11 +20,13 @@ class Pos {
 
 class Obj {
     pos;
+    logicPos;
     image;
     map;
 
     constructor(pos, map, image) {
         this.pos = pos;
+        this.logicPos = new Pos(pos.x, pos.y);
         this.map = map;
 
         this.image = image;

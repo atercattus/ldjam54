@@ -16,6 +16,8 @@ const Colors = {
     [TypeAggressive]: 0xff3366,
 };
 
+let counter = 1;
+
 class Thing extends Obj {
     type;
     playerPosFunc;
@@ -27,9 +29,9 @@ class Thing extends Obj {
 
     dreamerWakeupInterval = undefined;
 
-    constructor(type, pos, map, parent, playerPosFunc) {
-        let color = Colors[type];
-        let radius = Radiuses[type];
+    constructor(type, pos, map, parent, playerPosFunc, tex) {
+        //let color = Colors[type];
+        //let radius = Radiuses[type];
         let viewDistance = ViewDistances[type];
 
         switch (type) {
@@ -43,13 +45,14 @@ class Thing extends Obj {
                 return;
         }
 
-        let image = new PIXI.Graphics();
-        image.beginFill(color);
-        image.drawCircle(0, 0, radius);
+        let image = new PIXI.Sprite(tex);
+        image.anchor.set(0.5, 0.5);
         image.zIndex = 1;
         parent.addChild(image);
 
         super(pos, map, image);
+
+        this.name = `t#${counter++}`;
 
         this.type = type;
         this.playerPosFunc = playerPosFunc;
@@ -66,10 +69,9 @@ class Thing extends Obj {
         if (this.dreamerWakeupInterval > 0) {
             if (--this.dreamerWakeupInterval <= 0) {
                 // angry mode :)
-                //console.log('dreamer is here!');
+                //console.log(this.name, 'dreamer is here!');
                 //this.dreamerWakeupInterval = undefined;
-
-                this.viewDistance = ViewDistances[TypeNormal];
+                //this.viewDistance = ViewDistances[TypeNormal];
             }
         }
 
@@ -81,16 +83,19 @@ class Thing extends Obj {
             if (see) {
                 this.gotoPos = playerPos;
             } else {
-                //console.log('didnt see');
+                //console.log(this.name, 'didnt see');
                 this.inSearch = false;
             }
         } else if (see) {
-            //console.log('see!');
+            //console.log(this.name, 'see!');
             if (this.type === TypeDreamer) {
                 if (this.dreamerWakeupInterval === undefined) {
-                    //console.log('dreamer wake up...');
-                    this.dreamerWakeupInterval = 1;
+                    //console.log(this.name, 'dreamer wake up...');
+                    this.viewDistance = ViewDistances[TypeNormal];
+                    this.dreamerWakeupInterval = 2;
                     return;
+                } else {
+                    //console.log(this.name, 'dreamer warming up...');
                 }
             }
             this.inSearch = true;
@@ -98,7 +103,7 @@ class Thing extends Obj {
         } else {
             if (!this.gotoPos) {
                 if ((this.type === TypeDreamer) && (this.dreamerWakeupInterval !== undefined)) {
-                    //console.log('dreamer calm down...');
+                    //console.log(this.name, 'dreamer calm down...');
                     this.viewDistance = ViewDistances[TypeDreamer];
                     this.dreamerWakeupInterval = undefined;
                     return;
@@ -121,6 +126,8 @@ class Thing extends Obj {
 
         let dx = this.pos.x - this.gotoPos.x;
         if (dx !== 0) {
+            this.image.scale.x = (dx > 0) ? -1 : 1;
+
             let targetX = (dx > 0) ? this.pos.x - 1 : this.pos.x + 1;
             if (map.isEmpty(targetX, this.pos.y)) {
                 let times = 10;
@@ -192,14 +199,23 @@ class Things {
     map;
     container;
 
+    enemyTextures = {};
+
     constructor(playerPosFunc, map, parent) {
         this.playerPosFunc = playerPosFunc;
         this.map = map;
         this.container = parent;
+
+        const texture = PIXI.Texture.from('assets/characters.png');
+        this.enemyTextures = {
+            [TypeDreamer]: new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 0, 32, 32)),
+            [TypeNormal]: new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 32, 32, 32)),
+            [TypeAggressive]: new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64, 32, 32)),
+        };
     }
 
     add(pos, type) {
-        let thing = new Thing(type, pos, this.map, this.container, this.playerPosFunc);
+        let thing = new Thing(type, pos, this.map, this.container, this.playerPosFunc, this.enemyTextures[type]);
         this.things.push(thing);
         thing.image.visible = false;
 

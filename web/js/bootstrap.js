@@ -60,7 +60,7 @@ game.app.stage.addChild(containerMap);
 
 let player;
 let playerPosFunc = function () {
-    return player ? player.getCellCoords() : new Pos(0, 0);
+    return player ? player.logicPos : new Pos(0, 0);
 };
 
 let map = new Map(containerMap, playerPosFunc);
@@ -103,16 +103,16 @@ document.addEventListener('keydown', (key) => {
 
     switch (key.code) {
         case "ArrowLeft":
-            did = player.moveBy(-1, 0);
+            did = player.moveByCell(-1, 0);
             break;
         case "ArrowRight":
-            did = player.moveBy(1, 0);
+            did = player.moveByCell(1, 0);
             break;
         case "ArrowUp":
-            did = player.moveBy(0, -1);
+            did = player.moveByCell(0, -1);
             break;
         case "ArrowDown":
-            did = player.moveBy(0, 1);
+            did = player.moveByCell(0, 1);
             break;
         case "KeyF":
             const mode = game.toggleFogOfWar();
