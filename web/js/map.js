@@ -18,7 +18,7 @@ class Map {
 
     sprites = [];
 
-    golds = [];
+    goldTotal = 0;
 
     visibleCells = [];
 
@@ -162,7 +162,8 @@ class Map {
                         gold.scale.x = 0.6;
                         gold.scale.y = 0.6;
                         sprite.addChild(gold);
-                        this.golds.push(gold);
+                        sprite.__gold = gold;
+                        this.goldTotal++;
                     }
                 }
             }

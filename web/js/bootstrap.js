@@ -97,6 +97,17 @@ game.buildFogOfWar(
     game.app.stage
 );
 
+const scoreText = new PIXI.Text('Score0', {
+    fontFamily: 'Arial',
+    fontSize: 24,
+    fill: 0xff1010,
+    align: 'center',
+});
+scoreText.zIndex = 2;
+game.app.stage.addChild(scoreText);
+player.setScoreText();
+
+
 let playerDidStep = false;
 
 document.addEventListener('keydown', (key) => {

@@ -26,7 +26,7 @@ class Thing extends Obj {
             case TypeNormal:
                 color = 0x5555cc;
                 radius = 12;
-                viewDistance = 3;
+                viewDistance = 4;
                 break;
             default: // wtf
                 return;
