@@ -5,7 +5,7 @@ class Player extends Obj {
     movingSpeed;
     movingDuration;
 
-    goldChess = 0;
+    goldChest = 0;
     goldInv = 0;
 
     constructor(pos, map, parent, viewDistance) {
@@ -89,10 +89,10 @@ class Player extends Obj {
             this.setScoreText();
         }
 
-        // chess cell
+        // chest cell
         if (this.map.map.start.x === this.pos.x && this.map.map.start.y === this.pos.y) {
             if (this.goldInv > 0) {
-                this.goldChess += this.goldInv;
+                this.goldChest += this.goldInv;
                 this.goldInv = 0;
                 this.setScoreText();
             }
@@ -124,6 +124,6 @@ class Player extends Obj {
     }
 
     setScoreText() {
-        scoreText.text = `Chess: ${this.goldChess.toString()} Inventory: ${this.goldInv.toString()} / Total ${this.map.goldTotal}`;
+        scoreText.text = `Chest: ${this.goldChest.toString()} Inventory: ${this.goldInv.toString()} / Total ${this.map.goldTotal}`;
     }
 }
