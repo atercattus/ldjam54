@@ -10,6 +10,9 @@ class Map {
 
     topTex;
     wallTex;
+    wall2Tex;
+    wall3Tex;
+    wall4Tex;
     groundTex;
     chestTex;
     goldTextures;
@@ -32,6 +35,9 @@ class Map {
         let texture = PIXI.Texture.from('assets/tiles.png');
         this.topTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 0, 64, 32));
         this.wallTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64, 64, 32));
+        this.wall2Tex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(64 * 2, 64, 64, 32));
+        this.wall3Tex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(64 * 2, 64 * 2, 64, 32));
+        this.wall4Tex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(64 * 2, 64 * 3, 64, 32));
         this.groundTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(64 * 2, 0, 64, 32));
         this.chestTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64 * 2, 64, 32));
 
@@ -146,6 +152,12 @@ class Map {
                     tex = this.topTex;
                 } else if (y === 0 || scheme[y - 1][x] === TypeWall) {
                     tex = this.wallTex;
+                    let alternatives = [this.wall2Tex, this.wall3Tex, this.wall4Tex];
+                    for (let i = 0; i < alternatives.length; i++) {
+                        if (Math.random() < 0.03) {
+                            tex = alternatives[i];
+                        }
+                    }
                 } else {
                     tex = this.groundTex;
                 }
@@ -188,9 +200,11 @@ class Map {
     addGold(groundSprite) {
         const gi = Math.floor(Math.random() * this.goldTextures.length);
         const gold = new PIXI.Sprite(this.goldTextures[gi]);
-        gold.x = 10;
-        gold.scale.x = 0.6;
-        gold.scale.y = 0.6;
+        gold.x = groundSprite.width * 0.5;
+        gold.y = groundSprite.height * 0.7;
+        gold.scale.x = 0.4;
+        gold.scale.y = 0.4;
+        gold.anchor.set(0.5, 0.5);
         groundSprite.addChild(gold);
         groundSprite.__gold = gold;
         this.goldTotal++;

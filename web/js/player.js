@@ -17,8 +17,8 @@ class Player extends Obj {
         ]);
         sprite.anchor.set(0.5, 0.5);
         sprite.zIndex = 1;
-        sprite.animationSpeed = 0.03;
-        sprite.play();
+        sprite.animationSpeed = 0.15;
+        //sprite.play();
         parent.addChild(sprite);
 
         super(pos, map, sprite);
@@ -41,6 +41,9 @@ class Player extends Obj {
             return false;
         }
 
+        this.image.gotoAndPlay(1);
+        this.image.scale.x = (dx > 0) ? 1 : -1;
+
         this.movingTo = new Pos(newX, newY);
         this.movingDuration = 0.25;
         if (dx === 0 && dy !== 0) {
@@ -61,6 +64,7 @@ class Player extends Obj {
             this.logicPos = new Pos(this.movingTo.x, this.movingTo.y);
             map.showNear(this.pos, this.viewDistance);
             this.movingTo = undefined;
+            this.image.gotoAndStop(2);
             this.processNewCell();
             return;
         }
