@@ -57,18 +57,27 @@ let gold2Sprite = new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(64, 0
 let gold3Sprite = new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(64, 64, 64, 64));
 
 let containerMap = new PIXI.Container();
+containerMap.sortableChildren = true; // for zIndex
 game.app.stage.addChild(containerMap);
 
-let map = new Map(topSprite, wallSprite, groundSprite, [gold1Sprite, gold2Sprite, gold3Sprite]);
+let player;
+let playerPosFunc = function () {
+    return player ? player.getCellCoords() : new Pos(0, 0);
+};
+
+let map = new Map(topSprite, wallSprite, groundSprite, [gold1Sprite, gold2Sprite, gold3Sprite], containerMap, playerPosFunc);
 map.build(containerMap);
 
 containerMap.x = (window.innerWidth - containerMap.width) / 2;
 containerMap.y = (window.innerHeight - containerMap.height) / 2;
 
-let player = new Player(new Pos(map.map.start.x, map.map.start.y), map, containerMap);
-
-//let thing = new Thing(new Pos(10, 30), map, cir2);
-let thing = new Thing(new Pos(13, 6), map, containerMap);
+const playerViewDistance = 6;
+player = new Player(
+    new Pos(map.map.start.x, map.map.start.y),
+    map,
+    containerMap,
+    playerViewDistance,
+);
 
 game.buildFogOfWar(
     new Pos(
@@ -78,25 +87,36 @@ game.buildFogOfWar(
     game.app.stage
 );
 
+let playerDidStep = false;
+
 document.addEventListener('keydown', (key) => {
+    let did = false;
+
     switch (key.code) {
         case "ArrowLeft":
-            player.moveBy(-1, 0);
+            did = player.moveBy(-1, 0);
             break;
         case "ArrowRight":
-            player.moveBy(1, 0);
+            did = player.moveBy(1, 0);
             break;
         case "ArrowUp":
-            player.moveBy(0, -1);
+            did = player.moveBy(0, -1);
             break;
         case "ArrowDown":
-            player.moveBy(0, 1);
+            did = player.moveBy(0, 1);
             break;
+    }
+
+    if (did) {
+        playerDidStep = true;
     }
 });
 
 game.app.ticker.add(() => {
     const delta = game.app.ticker.elapsedMS / 1000;
     player.update(delta);
-    map.update(delta);
+    //things.update(delta, playerDidStep);
+    map.update(delta, playerDidStep);
+
+    playerDidStep = false;
 });

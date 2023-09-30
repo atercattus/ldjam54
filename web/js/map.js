@@ -22,11 +22,15 @@ class Map {
 
     visibleCells = [];
 
-    constructor(topSprite, wallSprite, groundSprite, goldSprites) {
+    things;
+
+    constructor(topSprite, wallSprite, groundSprite, goldSprites, parent, playerPosFunc) {
         this.topSprite = topSprite;
         this.wallSprite = wallSprite;
         this.groundSprite = groundSprite;
         this.goldSprites = goldSprites;
+
+        this.things = new Things(playerPosFunc, this, parent);
     }
 
     gen() {
@@ -36,11 +40,11 @@ class Map {
             [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,],
-            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,],
+            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,],
             [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
             [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
             [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
-            [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
             [0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
             [0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
             [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
@@ -52,7 +56,7 @@ class Map {
             [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
             [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
             [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,],
-            [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0,],
             [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,],
             [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
@@ -60,14 +64,14 @@ class Map {
             [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
             [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
             [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,],
-            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,],
+            [0, 0, 0, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,],
         ];
 
         return {
             map: map,
             rows: map.length,
             cols: map[0].length,
-            start: {x: 12, y: 10}, // counts from 1
+            start: {x: 1, y: 1}, // counts from 1
         };
     }
 
@@ -132,6 +136,16 @@ class Map {
                 sprite.x = (x + 1) * this.CellW;
                 sprite.y = (y + 1) * this.CellH;
 
+                switch (type) {
+                    case 2:
+                        this.map.start.x = x + 1;
+                        this.map.start.y = y + 1;
+                        break;
+                    case 3:
+                        this.things.add(new Pos(x + 1, y + 1));
+                        break;
+                }
+
                 if (tex === this.groundSprite) {
                     if (Math.random() < 0.1) {
                         const gi = Math.floor(Math.random() * this.goldSprites.length);
@@ -155,14 +169,16 @@ class Map {
         return (y + 0.5) * this.CellH;
     }
 
-    // xy2idxs(x, y) {
+    // pos2idxs(pos) {
     //     return [
-    //         Math.ceil(x / this.CellW),
-    //         Math.ceil(y / this.CellH)
+    //         Math.ceil(pos.x / this.CellW),
+    //         Math.ceil(pos.y / this.CellH)
     //     ];
     // }
 
     isEmpty(x, y) {
+        x = Math.round(x);
+        y = Math.round(y);
         if (x <= 0 || x > this.map.cols) {
             return false;
         }
@@ -173,6 +189,18 @@ class Map {
             return false;
         }
         return true;
+    }
+
+    isVisible(x, y) {
+        x = Math.round(x);
+        y = Math.round(y);
+        if (x <= 0 || x > this.map.cols) {
+            return false;
+        }
+        if (y <= 0 || y > this.map.rows) {
+            return false;
+        }
+        return this.sprites[y][x].visible;
     }
 
     canSee(from, to) {
@@ -281,6 +309,7 @@ class Map {
         }
     }
 
-    update(delta) {
+    update(delta, playerDidStep) {
+        this.things.update(delta, playerDidStep);
     }
 }
