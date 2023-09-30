@@ -4,22 +4,11 @@ const ViewDistances = {
     [TypeAggressive]: 9,
 };
 
-const Radiuses = {
-    [TypeDreamer]: 10,
-    [TypeNormal]: 12,
-    [TypeAggressive]: 20,
-};
-
-const Colors = {
-    [TypeDreamer]: 0xaaaaaa,
-    [TypeNormal]: 0x5555cc,
-    [TypeAggressive]: 0xff3366,
-};
-
 let counter = 1;
 
 class Thing extends Obj {
     type;
+    sprite;
     playerPosFunc;
     viewDistance;
 
@@ -29,9 +18,7 @@ class Thing extends Obj {
 
     dreamerWakeupInterval = undefined;
 
-    constructor(type, pos, map, parent, playerPosFunc, tex) {
-        //let color = Colors[type];
-        //let radius = Radiuses[type];
+    constructor(type, pos, map, parent, playerPosFunc, sprite) {
         let viewDistance = ViewDistances[type];
 
         switch (type) {
@@ -45,16 +32,19 @@ class Thing extends Obj {
                 return;
         }
 
-        let image = new PIXI.Sprite(tex);
-        image.anchor.set(0.5, 0.5);
-        image.zIndex = 1;
-        parent.addChild(image);
+        sprite.anchor.set(0.5, 0.5);
+        sprite.zIndex = 1;
+        parent.addChild(sprite);
 
-        super(pos, map, image);
+        super(pos, map, sprite);
 
+        if (type !== TypeDreamer) {
+            sprite.play();
+        }
         this.name = `t#${counter++}`;
 
         this.type = type;
+        this.sprite = sprite;
         this.playerPosFunc = playerPosFunc;
         this.viewDistance = viewDistance;
     }
@@ -91,6 +81,7 @@ class Thing extends Obj {
             if (this.type === TypeDreamer) {
                 if (this.dreamerWakeupInterval === undefined) {
                     //console.log(this.name, 'dreamer wake up...');
+                    this.sprite.play();
                     this.viewDistance = ViewDistances[TypeNormal];
                     this.dreamerWakeupInterval = 2;
                     return;
@@ -104,6 +95,7 @@ class Thing extends Obj {
             if (!this.gotoPos) {
                 if ((this.type === TypeDreamer) && (this.dreamerWakeupInterval !== undefined)) {
                     //console.log(this.name, 'dreamer calm down...');
+                    this.sprite.stop();
                     this.viewDistance = ViewDistances[TypeDreamer];
                     this.dreamerWakeupInterval = undefined;
                     return;
@@ -207,15 +199,28 @@ class Things {
         this.container = parent;
 
         const texture = PIXI.Texture.from('assets/characters.png');
+
         this.enemyTextures = {
-            [TypeDreamer]: new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 0, 32, 32)),
-            [TypeNormal]: new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 32, 32, 32)),
-            [TypeAggressive]: new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64, 32, 32)),
+            [TypeDreamer]: [
+                new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 0, 32, 32)),
+                new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(32, 0, 32, 32)),
+            ],
+            [TypeNormal]: [
+                new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 32, 32, 32)),
+                new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(32, 32, 32, 32)),
+            ],
+            [TypeAggressive]: [
+                new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64, 32, 32)),
+                new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(32, 64, 32, 32)),
+            ]
         };
     }
 
     add(pos, type) {
-        let thing = new Thing(type, pos, this.map, this.container, this.playerPosFunc, this.enemyTextures[type]);
+        const sprite = new PIXI.AnimatedSprite(this.enemyTextures[type]);
+        sprite.animationSpeed = 0.03;
+
+        let thing = new Thing(type, pos, this.map, this.container, this.playerPosFunc, sprite);
         this.things.push(thing);
         thing.image.visible = false;
 

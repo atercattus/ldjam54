@@ -11,7 +11,7 @@ class Map {
     topTex;
     wallTex;
     groundTex;
-    chessTex;
+    chestTex;
     goldTextures;
 
     map = {};
@@ -33,7 +33,7 @@ class Map {
         this.topTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 0, 64, 32));
         this.wallTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64, 64, 32));
         this.groundTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(64 * 2, 0, 64, 32));
-        this.chessTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64 * 2, 64, 32));
+        this.chestTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64 * 2, 64, 32));
 
         // gold textures
         let goldTex = PIXI.Texture.from('assets/gold.png');
@@ -159,8 +159,10 @@ class Map {
                         this.map.start.x = x + 1;
                         this.map.start.y = y + 1;
 
-                        const chess = new PIXI.Sprite(this.chessTex);
-                        sprite.addChild(chess);
+                        const chest = new PIXI.Sprite(this.chestTex);
+                        chest.anchor.set(0, 0);
+                        chest.scale.set(0.7);
+                        sprite.addChild(chest);
                         break;
 
                     case TypeDreamer:

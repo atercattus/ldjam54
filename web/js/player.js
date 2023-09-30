@@ -9,12 +9,19 @@ class Player extends Obj {
     goldInv = 0;
 
     constructor(pos, map, parent, viewDistance) {
-        let image = new PIXI.Graphics();
-        image.beginFill(0xffffff);
-        image.drawCircle(0, 0, 12);
-        parent.addChild(image);
+        const texture = PIXI.Texture.from('assets/characters.png');
 
-        super(pos, map, image);
+        const sprite = new PIXI.AnimatedSprite([
+            new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 32 * 4, 32, 32)),
+            new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(32, 32 * 4, 32, 32)),
+        ]);
+        sprite.anchor.set(0.5, 0.5);
+        sprite.zIndex = 1;
+        sprite.animationSpeed = 0.03;
+        sprite.play();
+        parent.addChild(sprite);
+
+        super(pos, map, sprite);
 
         this.viewDistance = viewDistance;
 

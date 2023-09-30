@@ -56,6 +56,7 @@ game.initApplication();
 
 let containerMap = new PIXI.Container();
 containerMap.sortableChildren = true; // for zIndex
+//containerMap.scale.set(2);
 game.app.stage.addChild(containerMap);
 
 let player;
