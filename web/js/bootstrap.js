@@ -54,18 +54,6 @@ class Game {
 const game = new Game();
 game.initApplication();
 
-// map textures
-let texture = PIXI.Texture.from('assets/tiles.png');
-let topSprite = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 0, 64, 32));
-let wallSprite = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64, 64, 32));
-let groundSprite = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(64 * 2, 0, 64, 32));
-
-// gold textures
-let goldTex = PIXI.Texture.from('assets/gold.png');
-let gold1Sprite = new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(0, 0, 64, 64));
-let gold2Sprite = new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(64, 0, 64, 64));
-let gold3Sprite = new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(64, 64, 64, 64));
-
 let containerMap = new PIXI.Container();
 containerMap.sortableChildren = true; // for zIndex
 game.app.stage.addChild(containerMap);
@@ -75,11 +63,8 @@ let playerPosFunc = function () {
     return player ? player.getCellCoords() : new Pos(0, 0);
 };
 
-let map = new Map(topSprite, wallSprite, groundSprite, [gold1Sprite, gold2Sprite, gold3Sprite], containerMap, playerPosFunc);
+let map = new Map(containerMap, playerPosFunc);
 map.build(containerMap);
-
-containerMap.x = (window.innerWidth - containerMap.width) / 2;
-containerMap.y = (window.innerHeight - containerMap.height) / 2;
 
 const playerViewDistance = 6;
 player = new Player(
@@ -88,6 +73,9 @@ player = new Player(
     containerMap,
     playerViewDistance,
 );
+
+containerMap.x = (window.innerWidth / 2) - player.image.x;
+containerMap.y = (window.innerHeight / 2) - player.image.y;
 
 game.buildFogOfWar(
     new Pos(

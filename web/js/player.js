@@ -5,7 +5,8 @@ class Player extends Obj {
     movingSpeed;
     movingDuration;
 
-    score = 0;
+    goldChess = 0;
+    goldInv = 0;
 
     constructor(pos, map, parent, viewDistance) {
         let image = new PIXI.Graphics();
@@ -79,16 +80,21 @@ class Player extends Obj {
             gold.destroy();
             sprite.__gold = undefined;
 
-            this.score++;
+            this.goldInv++;
             this.setScoreText();
+        }
+
+        // chess cell
+        if (this.map.map.start.x === this.pos.x && this.map.map.start.y === this.pos.y) {
+            if (this.goldInv > 0) {
+                this.goldChess += this.goldInv;
+                this.goldInv = 0;
+                this.setScoreText();
+            }
         }
     }
 
     setScoreText() {
-        let suffix = "";
-        if (this.score === this.map.goldTotal) {
-            suffix = ". You WON";
-        }
-        scoreText.text = `Gold ${this.score.toString()}/${this.map.goldTotal} found` + suffix;
+        scoreText.text = `Chess: ${this.goldChess.toString()} Inventory: ${this.goldInv.toString()} / Total ${this.map.goldTotal}`;
     }
 }

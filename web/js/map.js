@@ -8,10 +8,11 @@ class Map {
     CellW = 64;
     CellH = 32;
 
-    topSprite;
-    wallSprite;
-    groundSprite;
-    goldSprites;
+    topTex;
+    wallTex;
+    groundTex;
+    chessTex;
+    goldTextures;
 
     map = {};
     container;
@@ -26,11 +27,21 @@ class Map {
 
     showThingsAlways = false; // powerup?
 
-    constructor(topSprite, wallSprite, groundSprite, goldSprites, parent, playerPosFunc) {
-        this.topSprite = topSprite;
-        this.wallSprite = wallSprite;
-        this.groundSprite = groundSprite;
-        this.goldSprites = goldSprites;
+    constructor(parent, playerPosFunc) {
+        // map textures
+        let texture = PIXI.Texture.from('assets/tiles.png');
+        this.topTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 0, 64, 32));
+        this.wallTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64, 64, 32));
+        this.groundTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(64 * 2, 0, 64, 32));
+        this.chessTex = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 64 * 2, 64, 32));
+
+        // gold textures
+        let goldTex = PIXI.Texture.from('assets/gold.png');
+        this.goldTextures = [
+            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(0, 0, 64, 64)),
+            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(64, 0, 64, 64)),
+            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(64, 64, 64, 64)),
+        ];
 
         this.things = new Things(playerPosFunc, this, parent);
     }
@@ -41,16 +52,16 @@ class Map {
         const A = TypeAggressive;
         const N = TypeNormal;
         const map = [
-            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,],
-            [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, D, 0,],
-            [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,],
+            [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [1, P, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,],
+            [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, D, 0,],
+            [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,],
             [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, D, 1, 1, 0,],
             [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, N, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,],
             [D, D, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
             [D, D, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,],
             [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
-            [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, P, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
+            [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,],
             [0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
             [0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
             [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,],
@@ -106,20 +117,20 @@ class Map {
 
         // top & bottom borders
         for (let x = 0; x <= cols + 1; x++) {
-            let sprite = this.makeMapSprite(this.topSprite, x, 0);
+            let sprite = this.makeMapSprite(this.topTex, x, 0);
             sprite.x = x * this.CellW;
 
-            sprite = this.makeMapSprite(this.topSprite, x, rows + 1);
+            sprite = this.makeMapSprite(this.topTex, x, rows + 1);
             sprite.x = x * this.CellW;
             sprite.y = (rows + 1) * this.CellH;
         }
 
         // left & right borders
         for (let y = 1; y <= rows; y++) {
-            let sprite = this.makeMapSprite(this.topSprite, 0, y);
+            let sprite = this.makeMapSprite(this.topTex, 0, y);
             sprite.y = y * this.CellH;
 
-            sprite = this.makeMapSprite(this.topSprite, cols + 1, y);
+            sprite = this.makeMapSprite(this.topTex, cols + 1, y);
             sprite.x = (cols + 1) * this.CellW;
             sprite.y = y * this.CellH;
         }
@@ -131,11 +142,11 @@ class Map {
                 const type = mapRow[x];
                 let tex;
                 if (type === TypeWall) {
-                    tex = this.topSprite;
+                    tex = this.topTex;
                 } else if (y === 0 || scheme[y - 1][x] === TypeWall) {
-                    tex = this.wallSprite;
+                    tex = this.wallTex;
                 } else {
-                    tex = this.groundSprite;
+                    tex = this.groundTex;
                 }
 
                 const sprite = this.makeMapSprite(tex, x + 1, y + 1);
@@ -146,6 +157,10 @@ class Map {
                     case TypePlayer:
                         this.map.start.x = x + 1;
                         this.map.start.y = y + 1;
+
+                        const chess = new PIXI.Sprite(this.chessTex);
+                        sprite.addChild(chess);
+
                         break;
                     case TypeDreamer:
                     case TypeNormal:
@@ -156,8 +171,8 @@ class Map {
 
                 if (type === TypeEmpty) {
                     if (Math.random() < 0.1) {
-                        const gi = Math.floor(Math.random() * this.goldSprites.length);
-                        const gold = new PIXI.Sprite(this.goldSprites[gi]);
+                        const gi = Math.floor(Math.random() * this.goldTextures.length);
+                        const gold = new PIXI.Sprite(this.goldTextures[gi]);
                         gold.x = 10;
                         gold.scale.x = 0.6;
                         gold.scale.y = 0.6;

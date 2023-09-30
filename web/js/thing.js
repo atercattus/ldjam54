@@ -1,3 +1,21 @@
+const ViewDistances = {
+    [TypeDreamer]: 0.5,
+    [TypeNormal]: 5,
+    [TypeAggressive]: 9,
+};
+
+const Radiuses = {
+    [TypeDreamer]: 10,
+    [TypeNormal]: 12,
+    [TypeAggressive]: 20,
+};
+
+const Colors = {
+    [TypeDreamer]: 0xaaaaaa,
+    [TypeNormal]: 0x5555cc,
+    [TypeAggressive]: 0xff3366,
+};
+
 class Thing extends Obj {
     type;
     playerPosFunc;
@@ -8,25 +26,16 @@ class Thing extends Obj {
     moveTimer;
 
     constructor(type, pos, map, parent, playerPosFunc) {
-        let color;
-        let radius;
-        let viewDistance;
+        let color = Colors[type];
+        let radius = Radiuses[type];
+        let viewDistance = ViewDistances[type];
 
         switch (type) {
             case TypeDreamer:
-                color = 0xaaaaaa;
-                radius = 10;
-                viewDistance = 0.5;
                 break;
             case TypeAggressive:
-                color = 0xff3366;
-                radius = 20;
-                viewDistance = 9;
                 break;
             case TypeNormal:
-                color = 0x5555cc;
-                radius = 12;
-                viewDistance = 4;
                 break;
             default: // wtf
                 return;
@@ -60,15 +69,16 @@ class Thing extends Obj {
             if (see) {
                 this.gotoPos = playerPos;
             } else {
-                console.log('didnt see');
+                //console.log('didnt see');
                 this.inSearch = false;
             }
         } else if (see) {
-            console.log('see!');
+            //console.log('see!');
             if (this.type === TypeDreamer) {
                 // angry mode :)
-                this.viewDistance = 4;
                 this.type = TypeNormal;
+                this.viewDistance = ViewDistances[this.type];
+                this.viewDistance = ViewDistances[this.type];
             }
             this.inSearch = true;
             this.gotoPos = playerPos;
