@@ -1,3 +1,11 @@
+const TypeWall = 0;
+const TypeEmpty = 1;
+const TypePlayer = 2;
+
+const TypeDreamer = 3;
+const TypeNormal = 4;
+const TypeAggressive = 5;
+
 class Pos {
     x;
     y;

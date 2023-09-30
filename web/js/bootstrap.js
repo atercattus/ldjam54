@@ -1,6 +1,9 @@
 class Game {
     app;
 
+    fowGradient;
+    fowBorders;
+
     constructor() {
     }
 
@@ -24,20 +27,27 @@ class Game {
 
     buildFogOfWar(pos, parent) {
         const half = 256; // half of texture size
-        let gradient = PIXI.Sprite.from('assets/gradient.png');
-        gradient.anchor.set(0.5);
-        gradient.x = pos.x;
-        gradient.y = pos.y;
-        this.app.stage.addChild(gradient);
+        this.fowGradient = PIXI.Sprite.from('assets/gradient.png');
+        this.fowGradient.anchor.set(0.5);
+        this.fowGradient.x = pos.x;
+        this.fowGradient.y = pos.y;
+        this.app.stage.addChild(this.fowGradient);
 
-        let gradBorders = new PIXI.Graphics();
-        gradBorders.beginFill(0);
-        gradBorders.drawRect(0, 0, gradient.x - half, window.innerHeight);
-        gradBorders.drawRect(gradient.x + half, 0, window.innerWidth, window.innerHeight);
-        gradBorders.drawRect(0, 0, window.innerWidth, gradient.y - half);
-        gradBorders.drawRect(0, gradient.y + half, window.innerWidth, window.innerHeight);
+        this.fowBorders = new PIXI.Graphics();
+        this.fowBorders.beginFill(0);
+        this.fowBorders.drawRect(0, 0, this.fowGradient.x - half, window.innerHeight);
+        this.fowBorders.drawRect(this.fowGradient.x + half, 0, window.innerWidth, window.innerHeight);
+        this.fowBorders.drawRect(0, 0, window.innerWidth, this.fowGradient.y - half);
+        this.fowBorders.drawRect(0, this.fowGradient.y + half, window.innerWidth, window.innerHeight);
 
-        parent.addChild(gradBorders);
+        parent.addChild(this.fowBorders);
+    }
+
+    toggleFogOfWar() {
+        const show = !this.fowGradient.visible;
+        this.fowGradient.visible = show;
+        this.fowBorders.visible = show;
+        return show;
     }
 }
 
@@ -105,6 +115,16 @@ document.addEventListener('keydown', (key) => {
         case "ArrowDown":
             did = player.moveBy(0, 1);
             break;
+        case "KeyF":
+            const mode = game.toggleFogOfWar();
+            console.log(`fog of war is ${mode ? 'on' : 'off'}`);
+            break;
+        case "KeyG":
+            map.showThingsAlways = !map.showThingsAlways;
+            console.log(`show things is ${map.showThingsAlways ? 'on' : 'off'}`);
+            break;
+        default:
+            console.log(key.code);
     }
 
     if (did) {
