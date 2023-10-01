@@ -57,7 +57,7 @@ class Player extends Obj {
 
         this.buildMinigameUI(sprite);
 
-        chestBottomText.text = 'Press [Space] for finish... if you want';
+        chestBottomText.text = 'Press [Enter] for finish... if you want';
         chestBottomText.visible = false;
 
         map.hideAllCells();
@@ -89,6 +89,7 @@ class Player extends Obj {
         }
 
         this.movingTo = new Pos(newX, newY);
+        this.logicPos = new Pos(newX, newY);
         this.parentMovingTo = new Pos(
             this.image.parent.x - SCALE * dx * this.map.CellW,
             this.image.parent.y - SCALE * dy * this.map.CellH,
@@ -126,7 +127,7 @@ class Player extends Obj {
         this.movingDuration -= delta;
         if (this.movingDuration <= 0) {
             this.moveTo(this.movingTo.x, this.movingTo.y);
-            this.logicPos = new Pos(this.movingTo.x, this.movingTo.y);
+            //this.logicPos = new Pos(this.movingTo.x, this.movingTo.y);
 
             this.image.parent.x = this.parentMovingTo.x;
             this.image.parent.y = this.parentMovingTo.y;
@@ -169,19 +170,18 @@ class Player extends Obj {
         const thing = this.map.getThingByCoords(this.getCellCoords());
         if (thing) {
             if ((thing.type !== TypeDreamer) || (thing.inSearch)) {
-                this.catched(thing.type);
+                this.catched(thing);
             }
         }
     }
 
-    catched(thingType) {
+    catched(thing) {
         this.isMoveDisabled = true;
 
-        console.log('catched by', thingType);
-
-        const size = ActionSizes[thingType];
+        const size = ActionSizes[thing.type];
 
         this.showMinigame(size, (isInside) => {
+            thing.cooldown = true;
             if (isInside) {
                 return;
             }
@@ -201,7 +201,7 @@ class Player extends Obj {
                 const dy = this.pos.y - startPos.y;
 
                 this.moveTo(startPos.x, startPos.y);
-                this.logicPos = startPos.y;
+                this.logicPos = new Pos(startPos.x, startPos.y);
 
                 this.image.parent.x += SCALE * dx * this.map.CellW;
                 this.image.parent.y += SCALE * dy * this.map.CellH;

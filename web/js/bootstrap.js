@@ -270,7 +270,8 @@ function startGame() {
                 break;
             case "Space":
                 player.minigameSpaceAction();
-
+                break;
+            case "Enter":
                 if (player.isInChestCell()) {
                     player.isMoveDisabled = true;
                     chestBottomText.text = `You collected ${player.goldChestValue} gold out of ${map.goldTotalValue}. Press [F5] to try again :)`;

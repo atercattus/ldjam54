@@ -11,6 +11,7 @@ const ActionSizes = {
 };
 
 class Thing extends Obj {
+    things;
     type;
     sprite;
     playerPosFunc;
@@ -22,7 +23,9 @@ class Thing extends Obj {
 
     dreamerWakeupInterval = undefined;
 
-    constructor(type, pos, map, parent, playerPosFunc, sprite) {
+    cooldown = false;
+
+    constructor(things, type, pos, map, parent, playerPosFunc, sprite) {
         let viewDistance = ViewDistances[type];
 
         switch (type) {
@@ -46,6 +49,7 @@ class Thing extends Obj {
             sprite.play();
         }
 
+        this.things = things;
         this.type = type;
         this.sprite = sprite;
         this.playerPosFunc = playerPosFunc;
@@ -56,6 +60,11 @@ class Thing extends Obj {
         this.image.visible = this.map.isVisibleForThing(this.pos.x, this.pos.y);
 
         if (!playerDidStep) {
+            return;
+        }
+
+        if (this.cooldown) {
+            this.cooldown = false;
             return;
         }
 
@@ -114,6 +123,16 @@ class Thing extends Obj {
         }
     }
 
+    isCellReallyEmpty(x, y) {
+        if (!this.map.isEmpty(x, y)) {
+            return false;
+        }
+        if (this.things.getByCoords(new Pos(x, y)) !== undefined) {
+            return false;
+        }
+        return true;
+    }
+
     moveToTarget(delta) {
         if (this.moveTimer) {
             return;
@@ -124,7 +143,8 @@ class Thing extends Obj {
             this.image.scale.x = (dx > 0) ? -1 : 1;
 
             let targetX = (dx > 0) ? this.pos.x - 1 : this.pos.x + 1;
-            if (map.isEmpty(targetX, this.pos.y)) {
+            if (this.isCellReallyEmpty(targetX, this.pos.y)) {
+                this.logicPos.x = targetX;
                 let times = 10;
                 dx = (targetX - this.pos.x) / times;
 
@@ -150,7 +170,8 @@ class Thing extends Obj {
             let times = 10;
 
             let targetY = (dy > 0) ? this.pos.y - 1 : this.pos.y + 1;
-            if (map.isEmpty(this.pos.x, targetY)) {
+            if (this.isCellReallyEmpty(this.pos.x, targetY)) {
+                this.logicPos.y = targetY;
                 dy = (targetY - this.pos.y) / times;
 
                 this.moveTimer = setInterval(() => {
@@ -223,7 +244,7 @@ class Things {
         const sprite = new PIXI.AnimatedSprite(this.enemyTextures[type]);
         sprite.animationSpeed = 0.03;
 
-        let thing = new Thing(type, pos, this.map, this.container, this.playerPosFunc, sprite);
+        let thing = new Thing(this, type, pos, this.map, this.container, this.playerPosFunc, sprite);
         this.things.push(thing);
         thing.image.visible = false;
 
@@ -239,7 +260,7 @@ class Things {
     getByCoords(pos) {
         for (let i = 0; i < this.things.length; i++) {
             const thing = this.things[i];
-            const thingPos = thing.getCellCoords()
+            const thingPos = thing.logicPos;
             if ((pos.x === thingPos.x) && (pos.y === thingPos.y)) {
                 return thing;
             }
