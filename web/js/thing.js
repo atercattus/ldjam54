@@ -7,7 +7,7 @@ const ViewDistances = {
 const ActionSizes = {
     [TypeDreamer]: 10,
     [TypeNormal]: 8,
-    [TypeAggressive]: 5,
+    [TypeAggressive]: 6,
 };
 
 class Thing extends Obj {
