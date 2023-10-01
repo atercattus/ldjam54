@@ -218,6 +218,9 @@ class Player extends Obj {
                 return;
             }
 
+            this.image.angle = 90;
+            this.image.gotoAndStop(0);
+
             map.hideAllCells();
 
             this.goldInvIdxs = [];
@@ -227,6 +230,9 @@ class Player extends Obj {
 
             setTimeout(() => {
                 this.isMoveDisabled = false;
+
+                this.image.angle = 0;
+                this.switchWalk(false);
 
                 const startPos = this.map.mapInfo.start;
                 const dx = this.pos.x - startPos.x;

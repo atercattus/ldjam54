@@ -270,14 +270,14 @@ function startGame() {
             case "ArrowDown":
                 did = player.moveByCell(0, 1);
                 break;
-            case "KeyF":
-                const mode = game.toggleFogOfWar();
-                console.log(`fog of war is ${mode ? 'on' : 'off'}`);
-                break;
-            case "KeyG":
-                map.showThingsAlways = !map.showThingsAlways;
-                console.log(`show things is ${map.showThingsAlways ? 'on' : 'off'}`);
-                break;
+            // case "KeyF":
+            //     const mode = game.toggleFogOfWar();
+            //     console.log(`fog of war is ${mode ? 'on' : 'off'}`);
+            //     break;
+            // case "KeyG":
+            //     map.showThingsAlways = !map.showThingsAlways;
+            //     console.log(`show things is ${map.showThingsAlways ? 'on' : 'off'}`);
+            //     break;
             case "Space":
                 player.minigameSpaceAction();
                 break;
@@ -288,8 +288,11 @@ function startGame() {
                 }
                 break;
             default:
-            //console.log(key.code);
+                //console.log(key.code);
+                return;
         }
+
+        key.preventDefault();
 
         if (did) {
             playerDidStep = true;
