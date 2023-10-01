@@ -44,8 +44,8 @@ class Player extends Obj {
 
         this.buildMinigameUI(sprite);
 
-        chestText.text = 'Press [Space] for finish... if you want';
-        chestText.visible = false;
+        chestBottomText.text = 'Press [Space] for finish... if you want';
+        chestBottomText.visible = false;
 
         map.hideAllCells();
         map.showNear(this.pos, this.viewDistance);
@@ -95,9 +95,9 @@ class Player extends Obj {
                     this.setScoreText();
                 }
             }
-            chestText.visible = (this.goldChestValue > 0) && (this.goldInvIdxs.length === 0);
+            chestBottomText.visible = (this.goldChestValue > 0) && (this.goldInvIdxs.length === 0);
         } else {
-            chestText.visible = false;
+            chestBottomText.visible = false;
         }
 
         if (!this.movingTo) {
@@ -168,7 +168,7 @@ class Player extends Obj {
 
             map.hideAllCells();
 
-            this.goldInv = 0;
+            this.goldInvIdxs = [];
             this.setScoreText();
 
             this.soundHitHurt.play();
@@ -192,21 +192,22 @@ class Player extends Obj {
     }
 
     setScoreText() {
+        scoreText.text = `\$ ${this.goldChestValue}`;
+
         let maxInfix = "";
-        if (this.goldInv === this.goldInvIdxsCap) {
+        if (this.goldInvIdxs.length === this.goldInvIdxsCap) {
             maxInfix = " (MAX. Return to the chest)"
         }
+        backpackText.text = `${this.goldInvIdxs.length} / ${this.goldInvIdxsCap}${maxInfix}`;
 
-        let values = "";
-        let invValue = 0;
+        backpackContainer.removeChildren();
         for (let i = 0; i < this.goldInvIdxs.length; i++) {
             const gi = this.goldInvIdxs[i];
-            const value = GoldValues[gi];
-            values += value.toString() + " ";
-            invValue += value;
-        }
 
-        scoreText.text = `Chest: ${this.goldChestValue}\nInventory: ${this.goldInvIdxs.length}/${this.goldInvIdxsCap}${maxInfix} ${invValue} value\n` + values;
+            const gold = new PIXI.Sprite(this.map.goldTextures[gi]);
+            gold.y = i * gold.height;
+            backpackContainer.addChild(gold);
+        }
     }
 
     playCoinSound() {

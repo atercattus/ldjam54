@@ -97,17 +97,17 @@ let playerPosFunc = function () {
 let map = new Map(containerMap, playerPosFunc);
 map.build(containerMap);
 
-const chestText = new PIXI.Text('LOL KEK [cheburek]', {
+const chestBottomText = new PIXI.Text('LOL KEK [cheburek]', {
     fontFamily: 'Arial',
     fontSize: 24,
     fill: 0xeeddaa,
     align: 'center',
 });
-chestText.zIndex = 2;
-chestText.x = window.innerWidth / 2;
-chestText.y = window.innerHeight * 0.99;
-chestText.anchor.set(0.5, 1);
-chestText.visible = true;
+chestBottomText.zIndex = 2;
+chestBottomText.x = window.innerWidth / 2;
+chestBottomText.y = window.innerHeight * 0.99;
+chestBottomText.anchor.set(0.5, 1);
+chestBottomText.visible = true;
 
 const playerViewDistance = 6;
 player = new Player(
@@ -128,6 +128,13 @@ game.buildFogOfWar(
     game.app.stage
 );
 
+let uiTex = PIXI.Texture.from('assets/ui.png');
+let chestSprite = PIXI.Sprite.from(new PIXI.Texture(uiTex.baseTexture, new PIXI.Rectangle(0, 32 * 2, 48, 32)));
+chestSprite.anchor.set(0, 0);
+game.app.stage.addChild(chestSprite);
+
+const textFromIcon = 20;
+
 const scoreText = new PIXI.Text('Score0', {
     fontFamily: 'Arial',
     fontSize: 24,
@@ -135,10 +142,38 @@ const scoreText = new PIXI.Text('Score0', {
     align: 'left',
 });
 scoreText.zIndex = 2;
+scoreText.x = chestSprite.width + textFromIcon;
+scoreText.y = chestSprite.y + chestSprite.height / 2;
+scoreText.anchor.set(0, 0.5);
+
+
+let backpackSprite = PIXI.Sprite.from(new PIXI.Texture(uiTex.baseTexture, new PIXI.Rectangle(0, 32 * 3, 48, 32)));
+backpackSprite.anchor.set(0, 0);
+backpackSprite.y = 40;
+game.app.stage.addChild(backpackSprite);
+
+const backpackText = new PIXI.Text('Score0', {
+    fontFamily: 'Arial',
+    fontSize: 24,
+    fill: 0xdddddd,
+    align: 'left',
+});
+backpackText.zIndex = 2;
+backpackText.x = backpackSprite.width + textFromIcon;
+backpackText.y = backpackSprite.y + backpackSprite.height / 2;
+backpackText.anchor.set(0, 0.5);
+
+const backpackContainer = new PIXI.Container();
+backpackContainer.x = 0;
+backpackContainer.y = backpackText.y + backpackText.height;
+backpackContainer.scale.set(SCALE);
+
 game.app.stage.addChild(scoreText);
+game.app.stage.addChild(backpackText);
+game.app.stage.addChild(backpackContainer);
 player.setScoreText();
 
-game.app.stage.addChild(chestText);
+game.app.stage.addChild(chestBottomText);
 
 game.buildMuteButton(game.app.stage);
 
@@ -238,7 +273,7 @@ function startGame() {
 
                 if (player.isInChestCell()) {
                     player.isMoveDisabled = true;
-                    chestText.text = `You collected ${player.goldChestValue} gold out of ${map.goldTotalValue}. Press [F5] to try again :)`;
+                    chestBottomText.text = `You collected ${player.goldChestValue} gold out of ${map.goldTotalValue}. Press [F5] to try again :)`;
                 }
                 break;
             default:
