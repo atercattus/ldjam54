@@ -174,6 +174,7 @@ logoText.y = logoSprite.y + 256 / 2 + 10;
 logoText.anchor.set(0.5, 0);
 game.app.stage.addChild(logoText);
 
+
 function startMenu() {
     logoSprite.visible = true;
     scoreText.visible = false;
@@ -237,11 +238,11 @@ function startGame() {
 
                 if (player.isInChestCell()) {
                     player.isMoveDisabled = true;
-                    chestText.text = `You collected ${player.goldChest} gold out of ${map.goldTotal}. Press [F5] to try again :)`;
+                    chestText.text = `You collected ${player.goldChestValue} gold out of ${map.goldTotalValue}. Press [F5] to try again :)`;
                 }
                 break;
             default:
-                console.log(key.code);
+            //console.log(key.code);
         }
 
         if (did) {

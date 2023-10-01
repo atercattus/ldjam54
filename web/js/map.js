@@ -4,6 +4,8 @@ class Cell extends PIXI.Sprite {
     }
 }
 
+const GoldValues = [1, 2, 5, 7];
+
 class Map {
     CellW = 64;
     CellH = 32;
@@ -22,7 +24,7 @@ class Map {
 
     sprites = [];
 
-    goldTotal = 0;
+    goldTotalValue = 0;
 
     visibleCells = [];
 
@@ -185,28 +187,50 @@ class Map {
                         break;
 
                     case TypeGold:
-                        this.addGold(sprite);
+                        const gi = 2 + Math.floor(Math.random() * 2);
+                        this.addGoldToGround(sprite, gi);
                         break;
-                }
-
-                if (type === TypeEmpty) {
-                    if (Math.random() < 0.1) {
-                        this.addGold(sprite);
-                    }
                 }
             }
         }
+
+        this.genRandomGold(this.goldTotalValue + 50);
     }
 
-    addGold(groundSprite) {
-        const gi = Math.floor(Math.random() * this.goldTextures.length);
+    addGoldToGround(groundSprite, gi) {
+        const value = GoldValues[gi];
+
         const gold = new PIXI.Sprite(this.goldTextures[gi]);
         gold.x = groundSprite.width * 0.5;
         gold.y = groundSprite.height * 0.7;
         gold.anchor.set(0.5, 0.5);
         groundSprite.addChild(gold);
         groundSprite.__gold = gold;
-        this.goldTotal++;
+        groundSprite.__goldIdx = gi;
+        this.goldTotalValue += value;
+    }
+
+    genRandomGold(totalCost) {
+        while (this.goldTotalValue < totalCost) {
+            const gi = Math.floor(Math.random() * 2);
+
+            let targetSprite;
+            while (true) {
+                const y = Math.floor(Math.random() * this.sprites.length);
+                const x = Math.floor(Math.random() * this.sprites[0].length);
+
+                if (!this.isEmpty(x, y)) {
+                    continue;
+                }
+                targetSprite = this.sprites[y][x];
+                if (targetSprite.__gold) {
+                    continue;
+                }
+                break;
+            }
+
+            this.addGoldToGround(targetSprite, gi);
+        }
     }
 
     idx2X(x) {

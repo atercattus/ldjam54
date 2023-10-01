@@ -13,9 +13,9 @@ class Player extends Obj {
     soundHitHurt;
     soundDeny;
 
-    goldChest = 0;
-    goldInv = 0;
-    goldInvMax = 9;
+    goldChestValue = 0;
+    goldInvIdxs = [];
+    goldInvIdxsCap = 9;
 
     minigameUI = {};
 
@@ -88,14 +88,14 @@ class Player extends Obj {
 
     update(delta) {
         if (this.isInChestCell()) {
-            if (this.goldInv > 0) {
+            if (this.goldInvIdxs.length > 0) {
                 if (this.playCoinSound()) {
-                    this.goldChest++;
-                    this.goldInv--;
+                    let gi = this.goldInvIdxs.pop();
+                    this.goldChestValue += GoldValues[gi];
                     this.setScoreText();
                 }
             }
-            chestText.visible = (this.goldChest > 0) && (this.goldInv === 0);
+            chestText.visible = (this.goldChestValue > 0) && (this.goldInvIdxs.length === 0);
         } else {
             chestText.visible = false;
         }
@@ -131,12 +131,15 @@ class Player extends Obj {
         const sprite = this.map.sprites[this.pos.y][this.pos.x];
         const gold = sprite.__gold;
         if (gold) {
-            if (this.goldInv < this.goldInvMax) {
+            if (this.goldInvIdxs.length < this.goldInvIdxsCap) {
+                const gi = sprite.__goldIdx;
+                const value = GoldValues[gi];
                 this.playCoinSound();
-                gold.destroy();
                 sprite.__gold = undefined;
+                sprite.__goldIdx = undefined;
+                gold.destroy();
 
-                this.goldInv++;
+                this.goldInvIdxs.push(gi);
                 this.setScoreText();
             } else {
                 this.soundDeny.play();
@@ -190,11 +193,20 @@ class Player extends Obj {
 
     setScoreText() {
         let maxInfix = "";
-        if (this.goldInv === this.goldInvMax) {
+        if (this.goldInv === this.goldInvIdxsCap) {
             maxInfix = " (MAX. Return to the chest)"
         }
 
-        scoreText.text = `Chest: ${this.goldChest}\nInventory: ${this.goldInv}/${this.goldInvMax}${maxInfix}`;
+        let values = "";
+        let invValue = 0;
+        for (let i = 0; i < this.goldInvIdxs.length; i++) {
+            const gi = this.goldInvIdxs[i];
+            const value = GoldValues[gi];
+            values += value.toString() + " ";
+            invValue += value;
+        }
+
+        scoreText.text = `Chest: ${this.goldChestValue}\nInventory: ${this.goldInvIdxs.length}/${this.goldInvIdxsCap}${maxInfix} ${invValue} value\n` + values;
     }
 
     playCoinSound() {
