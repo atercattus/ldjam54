@@ -254,6 +254,9 @@ function startGame() {
         playerDidStep = false;
     });
 
+    const startedAt = new Date().getTime();
+    let playerSteps = 0;
+
     document.addEventListener('keydown', (key) => {
         let did = false;
 
@@ -285,6 +288,9 @@ function startGame() {
                 if (player.isInChestCell()) {
                     player.isMoveDisabled = true;
                     chestBottomText.text = `You collected ${player.goldChestValue} gold out of ${map.goldTotalValue}. Press [F5] to try again :)`;
+
+                    const elapsed = (new Date().getTime()) - startedAt;
+                    fetch(`https://ater.me/ldjam54stats?collected=${player.goldChestValue}_${map.goldTotalValue}&elap=${elapsed}&steps=${playerSteps}`);
                 }
                 break;
             default:
@@ -296,6 +302,7 @@ function startGame() {
 
         if (did) {
             playerDidStep = true;
+            playerSteps++;
         }
     });
 }
