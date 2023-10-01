@@ -56,7 +56,9 @@ class Player extends Obj {
         }
 
         this.image.gotoAndPlay(1);
-        this.image.scale.x = (dx > 0) ? 1 : -1;
+        if (dx !== 0) {
+            this.image.scale.x = (dx > 0) ? 1 : -1;
+        }
 
         this.movingTo = new Pos(newX, newY);
         this.parentMovingTo = new Pos(

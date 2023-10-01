@@ -114,6 +114,13 @@ game.app.stage.addChild(doneText);
 
 let playerDidStep = false;
 
+let soundInGameTheme = PIXI.sound.Sound.from({url: 'assets/gameTheme.mp3', preload: true,});
+soundInGameTheme.volume = 0.5;
+soundInGameTheme.loop = true;
+setTimeout(() => {
+    soundInGameTheme.play();
+}, 500);
+
 document.addEventListener('keydown', (key) => {
     let did = false;
 
