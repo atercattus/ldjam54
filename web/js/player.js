@@ -211,7 +211,7 @@ class Player extends Obj {
     }
 
     buildMinigameUI(parent) {
-        const tex = PIXI.Texture.from('assets/minigame.png');
+        const tex = PIXI.Texture.from('assets/ui.png');
 
         // bg
         const sprite = new PIXI.Sprite(

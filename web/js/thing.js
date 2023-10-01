@@ -6,8 +6,8 @@ const ViewDistances = {
 
 const ActionSizes = {
     [TypeDreamer]: 12,
-    [TypeNormal]: 15,
-    [TypeAggressive]: 7,
+    [TypeNormal]: 10,
+    [TypeAggressive]: 6,
 };
 
 let counter = 1;

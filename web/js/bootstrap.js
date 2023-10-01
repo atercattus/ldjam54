@@ -17,6 +17,8 @@ class Game {
         });
         this.app.renderer.backgroundColor = 0;
 
+        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+
         document.body.appendChild(this.app.view);
 
         this.app.renderer.view.style.position = 'absolute';
@@ -49,6 +51,28 @@ class Game {
         this.fowGradient.visible = show;
         this.fowBorders.visible = show;
         return show;
+    }
+
+    buildMuteButton(parent) {
+        const tex = PIXI.Texture.from('assets/ui.png');
+
+        const btn = new PIXI.AnimatedSprite([
+            new PIXI.Texture(tex.baseTexture, new PIXI.Rectangle(48, 32, 32, 32)),
+            new PIXI.Texture(tex.baseTexture, new PIXI.Rectangle(48 + 32, 32, 32, 32)),
+        ]);
+        btn.scale.set(SCALE);
+        btn.anchor.set(1, 0);
+        btn.x = window.innerWidth - 10;
+        btn.y = 10;
+
+        btn.interactive = true;
+        btn.cursor = 'pointer';
+        btn.on('click', () => {
+            const muted = PIXI.sound.toggleMuteAll();
+            btn.gotoAndStop(muted ? 1 : 0);
+        });
+
+        parent.addChild(btn);
     }
 }
 
@@ -115,6 +139,8 @@ game.app.stage.addChild(scoreText);
 player.setScoreText();
 
 game.app.stage.addChild(chestText);
+
+game.buildMuteButton(game.app.stage);
 
 let playerDidStep = false;
 
