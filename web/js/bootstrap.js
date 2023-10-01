@@ -131,7 +131,7 @@ game.buildFogOfWar(
 const scoreText = new PIXI.Text('Score0', {
     fontFamily: 'Arial',
     fontSize: 24,
-    fill: 0xff1010,
+    fill: 0xdddddd,
     align: 'left',
 });
 scoreText.zIndex = 2;
@@ -151,55 +151,103 @@ menuTheme.loop = true;
 soundInGameTheme = PIXI.sound.Sound.from({url: 'assets/gameTheme.mp3', preload: true,});
 soundInGameTheme.volume = 0.5;
 soundInGameTheme.loop = true;
-setTimeout(() => {
+
+const logoSprite = PIXI.Sprite.from('assets/logo.png');
+logoSprite.anchor.set(0.5);
+logoSprite.x = window.innerWidth / 2;
+logoSprite.y = window.innerHeight / 2;
+
+const logoBg = new PIXI.Graphics();
+logoBg.beginFill(0xffffff);
+logoBg.drawRect(0, 0, 16, 16);
+logoBg.scale.set(window.innerWidth / 16, window.innerHeight / 16);
+game.app.stage.addChild(logoBg);
+game.app.stage.addChild(logoSprite);
+const logoText = new PIXI.Text('Collect as much gold as you can!\n\nClick to start', {
+    fontFamily: 'Arial',
+    fontSize: 24,
+    fill: 0,
+    align: 'center',
+});
+logoText.x = window.innerWidth / 2;
+logoText.y = logoSprite.y + 256 / 2 + 10;
+logoText.anchor.set(0.5, 0);
+game.app.stage.addChild(logoText);
+
+function startMenu() {
+    logoSprite.visible = true;
+    scoreText.visible = false;
+    containerMap.visible = false;
+
+    logoBg.interactive = true;
+    logoBg.cursor = 'pointer';
+    logoBg.on('click', () => {
+        startGame();
+    });
+
+    setTimeout(() => {
+        menuTheme.play();
+    }, 500)
+}
+
+function startGame() {
+    logoSprite.visible = false;
+    logoBg.visible = false;
+    logoText.visible = false;
+    scoreText.visible = true;
+    containerMap.visible = true;
+
+    menuTheme.stop();
     soundInGameTheme.play();
-}, 500);
 
-document.addEventListener('keydown', (key) => {
-    let did = false;
+    game.app.ticker.add(() => {
+        const delta = game.app.ticker.elapsedMS / 1000;
+        player.update(delta);
+        map.update(delta, playerDidStep);
 
-    switch (key.code) {
-        case "ArrowLeft":
-            did = player.moveByCell(-1, 0);
-            break;
-        case "ArrowRight":
-            did = player.moveByCell(1, 0);
-            break;
-        case "ArrowUp":
-            did = player.moveByCell(0, -1);
-            break;
-        case "ArrowDown":
-            did = player.moveByCell(0, 1);
-            break;
-        case "KeyF":
-            const mode = game.toggleFogOfWar();
-            console.log(`fog of war is ${mode ? 'on' : 'off'}`);
-            break;
-        case "KeyG":
-            map.showThingsAlways = !map.showThingsAlways;
-            console.log(`show things is ${map.showThingsAlways ? 'on' : 'off'}`);
-            break;
-        case "Space":
-            player.minigameSpaceAction();
+        playerDidStep = false;
+    });
 
-            if (player.isInChestCell()) {
-                player.isMoveDisabled = true;
-                chestText.text = `You collected ${player.goldChest} gold out of ${map.goldTotal}. Press [F5] to try again :)`;
-            }
-            break;
-        default:
-            console.log(key.code);
-    }
+    document.addEventListener('keydown', (key) => {
+        let did = false;
 
-    if (did) {
-        playerDidStep = true;
-    }
-});
+        switch (key.code) {
+            case "ArrowLeft":
+                did = player.moveByCell(-1, 0);
+                break;
+            case "ArrowRight":
+                did = player.moveByCell(1, 0);
+                break;
+            case "ArrowUp":
+                did = player.moveByCell(0, -1);
+                break;
+            case "ArrowDown":
+                did = player.moveByCell(0, 1);
+                break;
+            case "KeyF":
+                const mode = game.toggleFogOfWar();
+                console.log(`fog of war is ${mode ? 'on' : 'off'}`);
+                break;
+            case "KeyG":
+                map.showThingsAlways = !map.showThingsAlways;
+                console.log(`show things is ${map.showThingsAlways ? 'on' : 'off'}`);
+                break;
+            case "Space":
+                player.minigameSpaceAction();
 
-game.app.ticker.add(() => {
-    const delta = game.app.ticker.elapsedMS / 1000;
-    player.update(delta);
-    map.update(delta, playerDidStep);
+                if (player.isInChestCell()) {
+                    player.isMoveDisabled = true;
+                    chestText.text = `You collected ${player.goldChest} gold out of ${map.goldTotal}. Press [F5] to try again :)`;
+                }
+                break;
+            default:
+                console.log(key.code);
+        }
 
-    playerDidStep = false;
-});
+        if (did) {
+            playerDidStep = true;
+        }
+    });
+}
+
+startMenu();

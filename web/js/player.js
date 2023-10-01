@@ -191,7 +191,7 @@ class Player extends Obj {
     setScoreText() {
         let maxInfix = "";
         if (this.goldInv === this.goldInvMax) {
-            maxInfix = " (MAX. Go to the chest)"
+            maxInfix = " (MAX. Return to the chest)"
         }
 
         scoreText.text = `Chest: ${this.goldChest}\nInventory: ${this.goldInv}/${this.goldInvMax}${maxInfix}`;
