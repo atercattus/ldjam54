@@ -44,9 +44,10 @@ class Map {
         // gold textures
         let goldTex = PIXI.Texture.from('assets/gold.png');
         this.goldTextures = [
-            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(0, 0, 64, 64)),
-            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(64, 0, 64, 64)),
-            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(64, 64, 64, 64)),
+            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(0, 0, 32, 32)),
+            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(32, 0, 32, 32)),
+            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(2 * 32, 0, 32, 32)),
+            new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(3 * 32, 0, 32, 32)),
         ];
 
         this.things = new Things(playerPosFunc, this, parent);
@@ -173,7 +174,7 @@ class Map {
 
                         const chest = new PIXI.Sprite(this.chestTex);
                         chest.anchor.set(0, 0);
-                        chest.scale.set(0.7);
+                        chest.scale.set(0.5);
                         sprite.addChild(chest);
                         break;
 
@@ -202,8 +203,6 @@ class Map {
         const gold = new PIXI.Sprite(this.goldTextures[gi]);
         gold.x = groundSprite.width * 0.5;
         gold.y = groundSprite.height * 0.7;
-        gold.scale.x = 0.4;
-        gold.scale.y = 0.4;
         gold.anchor.set(0.5, 0.5);
         groundSprite.addChild(gold);
         groundSprite.__gold = gold;

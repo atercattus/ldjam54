@@ -44,7 +44,7 @@ class Player extends Obj {
 
         this.buildMinigameUI(sprite);
 
-        chestText.text = 'Press [Space] for finish';
+        chestText.text = 'Press [Space] for finish... if you want';
         chestText.visible = false;
 
         map.hideAllCells();

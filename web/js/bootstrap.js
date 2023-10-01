@@ -100,7 +100,7 @@ map.build(containerMap);
 const chestText = new PIXI.Text('LOL KEK [cheburek]', {
     fontFamily: 'Arial',
     fontSize: 24,
-    fill: 0xff1010,
+    fill: 0xeeddaa,
     align: 'center',
 });
 chestText.zIndex = 2;
