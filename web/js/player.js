@@ -2,11 +2,20 @@ class Player extends Obj {
     viewDistance;
 
     movingTo;
+    parentMovingTo;
     movingSpeed;
     movingDuration;
 
+    isMoveDisabled = false;
+
+    soundCoin;
+    isSoundCoinPlaying = false;
+    soundHitHurt;
+    soundDeny;
+
     goldChest = 0;
     goldInv = 0;
+    goldInvMax = 9;
 
     constructor(pos, map, parent, viewDistance) {
         const texture = PIXI.Texture.from('assets/characters.png');
@@ -23,6 +32,11 @@ class Player extends Obj {
 
         super(pos, map, sprite);
 
+        this.soundCoin = PIXI.sound.Sound.from({url: 'assets/coin.mp3', preload: true,});
+        this.soundHitHurt = PIXI.sound.Sound.from({url: 'assets/hitHurt.mp3', preload: true,});
+        this.soundDeny = PIXI.sound.Sound.from({url: 'assets/deny.mp3', preload: true,});
+        this.soundDeny.volume = 0.7;
+
         this.viewDistance = viewDistance;
 
         map.hideAllCells();
@@ -30,7 +44,7 @@ class Player extends Obj {
     }
 
     moveByCell(dx, dy) {
-        if (this.movingTo) {
+        if (this.movingTo || this.isMoveDisabled) {
             return false;
         }
 
@@ -45,6 +59,10 @@ class Player extends Obj {
         this.image.scale.x = (dx > 0) ? 1 : -1;
 
         this.movingTo = new Pos(newX, newY);
+        this.parentMovingTo = new Pos(
+            this.image.parent.x - dx * this.map.CellW,
+            this.image.parent.y - dy * this.map.CellH,
+        );
         this.movingDuration = 0.25;
         if (dx === 0 && dy !== 0) {
             this.movingDuration /= 1.6;
@@ -55,6 +73,20 @@ class Player extends Obj {
     }
 
     update(delta) {
+        // chest cell?
+        if (this.map.map.start.x === this.pos.x && this.map.map.start.y === this.pos.y) {
+            if (this.goldInv > 0) {
+                if (this.playCoinSound()) {
+                    this.goldChest++;
+                    this.goldInv--;
+                    this.setScoreText();
+                }
+            }
+            doneText.visible = (this.goldChest > 0) && (this.goldInv === 0);
+        } else {
+            doneText.visible = false;
+        }
+
         if (!this.movingTo) {
             return;
         }
@@ -62,6 +94,10 @@ class Player extends Obj {
         if (this.movingDuration <= 0) {
             this.moveTo(this.movingTo.x, this.movingTo.y);
             this.logicPos = new Pos(this.movingTo.x, this.movingTo.y);
+
+            this.image.parent.x = this.parentMovingTo.x;
+            this.image.parent.y = this.parentMovingTo.y;
+
             map.showNear(this.pos, this.viewDistance);
             this.movingTo = undefined;
             this.image.gotoAndStop(2);
@@ -82,19 +118,15 @@ class Player extends Obj {
         const sprite = this.map.sprites[this.pos.y][this.pos.x];
         const gold = sprite.__gold;
         if (gold) {
-            gold.destroy();
-            sprite.__gold = undefined;
+            if (this.goldInv < this.goldInvMax) {
+                this.playCoinSound();
+                gold.destroy();
+                sprite.__gold = undefined;
 
-            this.goldInv++;
-            this.setScoreText();
-        }
-
-        // chest cell
-        if (this.map.map.start.x === this.pos.x && this.map.map.start.y === this.pos.y) {
-            if (this.goldInv > 0) {
-                this.goldChest += this.goldInv;
-                this.goldInv = 0;
+                this.goldInv++;
                 this.setScoreText();
+            } else {
+                this.soundDeny.play();
             }
         }
 
@@ -107,23 +139,51 @@ class Player extends Obj {
     }
 
     catched() {
-        this.goldInv = 0;
-        this.setScoreText();
-        const startPos = this.map.map.start;
-        const dx = this.pos.x - startPos.x;
-        const dy = this.pos.y - startPos.y;
-
-        this.moveTo(startPos.x, startPos.y);
-        this.logicPos = startPos.y;
-
-        this.image.parent.x += dx * this.map.CellW;
-        this.image.parent.y += dy * this.map.CellH;
+        this.isMoveDisabled = true;
 
         map.hideAllCells();
-        map.showNear(this.pos, this.viewDistance);
+
+        this.goldInv = 0;
+        this.setScoreText();
+
+        this.soundHitHurt.play();
+
+        setTimeout(() => {
+            this.isMoveDisabled = false;
+
+            const startPos = this.map.map.start;
+            const dx = this.pos.x - startPos.x;
+            const dy = this.pos.y - startPos.y;
+
+            this.moveTo(startPos.x, startPos.y);
+            this.logicPos = startPos.y;
+
+            this.image.parent.x += dx * this.map.CellW;
+            this.image.parent.y += dy * this.map.CellH;
+
+            map.showNear(this.pos, this.viewDistance);
+        }, 1000);
     }
 
     setScoreText() {
-        scoreText.text = `Chest: ${this.goldChest.toString()} Inventory: ${this.goldInv.toString()} / Total ${this.map.goldTotal}`;
+        let maxInfix = "";
+        if (this.goldInv === this.goldInvMax) {
+            maxInfix = " (MAX)"
+        }
+
+        scoreText.text = `Chest: ${this.goldChest}\nInventory: ${this.goldInv}/${this.goldInvMax}${maxInfix}`; //\nTotal ${this.map.goldTotal}`;
+    }
+
+    playCoinSound() {
+        if (this.isSoundCoinPlaying) {
+            return false;
+        }
+        this.isSoundCoinPlaying = true;
+
+        this.soundCoin.play().on('end', () => {
+            this.isSoundCoinPlaying = false;
+        });
+
+        return true;
     }
 }

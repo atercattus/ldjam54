@@ -90,12 +90,24 @@ const scoreText = new PIXI.Text('Score0', {
     fontFamily: 'Arial',
     fontSize: 24,
     fill: 0xff1010,
-    align: 'center',
+    align: 'left',
 });
 scoreText.zIndex = 2;
 game.app.stage.addChild(scoreText);
 player.setScoreText();
 
+const doneText = new PIXI.Text('Press [Space] for finish', {
+    fontFamily: 'Arial',
+    fontSize: 24,
+    fill: 0xff1010,
+    align: 'center',
+});
+doneText.zIndex = 2;
+doneText.x = window.innerWidth / 2;
+doneText.y = window.innerHeight;
+doneText.anchor.set(0.5, 1);
+doneText.visible = false;
+game.app.stage.addChild(doneText);
 
 let playerDidStep = false;
 
@@ -122,6 +134,12 @@ document.addEventListener('keydown', (key) => {
         case "KeyG":
             map.showThingsAlways = !map.showThingsAlways;
             console.log(`show things is ${map.showThingsAlways ? 'on' : 'off'}`);
+            break;
+        case "Space":
+            if (player.goldChest > 0) {
+                player.isMoveDisabled = true;
+                doneText.text = `You collected ${player.goldChest} gold out of ${map.goldTotal}. F5 for try again :)`;
+            }
             break;
         default:
             console.log(key.code);
