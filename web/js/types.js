@@ -8,6 +8,9 @@ const TypeAggressive = 5;
 
 const TypeGold = 6;
 
+const TypePowerUpSee = 7;
+const TypePowerUpLight = 8;
+
 class Pos {
     x;
     y;

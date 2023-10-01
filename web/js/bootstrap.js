@@ -53,6 +53,16 @@ class Game {
         return show;
     }
 
+    showFogOfWar() {
+        this.fowGradient.visible = true;
+        this.fowBorders.visible = true;
+    }
+
+    hideFogOfWar() {
+        this.fowGradient.visible = false;
+        this.fowBorders.visible = false;
+    }
+
     buildMuteButton(parent) {
         const tex = PIXI.Texture.from('assets/ui.png');
 

@@ -19,6 +19,9 @@ class Map {
     chestTex;
     goldTextures;
 
+    powerUpSeeTex;
+    powerUpLightTex;
+
     mapInfo = {};
     container;
 
@@ -30,7 +33,12 @@ class Map {
 
     things;
 
-    showThingsAlways = false; // powerup?
+    showThingsAlways = false;
+    showThingsPowerupActive = 0;
+    showThingsPowerupActiveMax = 50;
+
+    hideFoWPowerupActive = 0;
+    hideFoWPowerupActiveMax = 50;
 
     constructor(parent, playerPosFunc) {
         // map textures
@@ -52,6 +60,9 @@ class Map {
             new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(3 * 32, 0, 32, 32)),
         ];
 
+        this.powerUpSeeTex = new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(0, 32, 16, 16));
+        this.powerUpLightTex = new PIXI.Texture(goldTex.baseTexture, new PIXI.Rectangle(16, 32, 16, 16));
+
         this.things = new Things(playerPosFunc, this, parent);
     }
 
@@ -61,10 +72,12 @@ class Map {
         const D = TypeDreamer;
         const A = TypeAggressive;
         const N = TypeNormal;
+        const S = TypePowerUpSee;
+        const L = TypePowerUpLight;
         const _ = 1;
         const map = [
             [_, _, 0, 0, _, _, _, _, _, _, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            [_, P, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, 0,],
+            [_, P, _, L, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, 0,],
             [0, 0, 0, _, 0, 0, _, _, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, D, 0,],
             [0, 0, 0, _, 0, 0, _, _, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _, 0,],
             [0, 0, 0, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, D, _, G, 0,],
@@ -79,7 +92,7 @@ class Map {
             [0, 0, _, _, 0, 0, _, _, 0, _, 0, 0, 0, 0, _, _, 0, 0, _, _, _, _, _, _,],
             [_, _, _, _, _, _, _, 0, 0, _, _, _, N, _, _, _, 0, 0, _, 0, _, _, 0, 0,],
             [_, _, _, _, _, _, _, 0, 0, 0, 0, 0, _, _, _, _, 0, 0, _, 0, _, _, 0, 0,],
-            [_, _, 0, 0, 0, 0, _, _, 0, 0, 0, 0, _, _, _, _, 0, 0, G, 0, _, _, 0, 0,],
+            [_, _, 0, 0, 0, 0, _, _, 0, 0, 0, 0, _, _, _, _, 0, 0, S, 0, _, _, 0, 0,],
             [_, _, 0, 0, 0, 0, _, _, 0, 0, 0, 0, _, _, _, _, 0, 0, 0, 0, _, _, 0, 0,],
             [_, D, 0, 0, _, _, _, _, _, _, 0, 0, _, _, _, _, 0, 0, 0, 0, _, _, 0, 0,],
             [_, _, 0, 0, _, _, _, _, _, _, 0, 0, _, _, _, _, 0, 0, 0, 0, _, _, 0, 0,],
@@ -199,6 +212,24 @@ class Map {
                         const gi = 2 + Math.floor(Math.random() * 2);
                         this.addGoldToGround(sprite, gi);
                         break;
+
+                    case TypePowerUpSee:
+                        const puSee = new PIXI.Sprite(this.powerUpSeeTex);
+                        puSee.anchor.set(0, 0);
+                        puSee.y = sprite.height / 2;
+                        sprite.addChild(puSee);
+                        sprite.__powerup = puSee;
+                        sprite.__powerupType = TypePowerUpSee;
+                        break;
+
+                    case TypePowerUpLight:
+                        const puLight = new PIXI.Sprite(this.powerUpLightTex);
+                        puLight.anchor.set(0, 0);
+                        puLight.y = sprite.height / 2;
+                        sprite.addChild(puLight);
+                        sprite.__powerup = puLight;
+                        sprite.__powerupType = TypePowerUpLight;
+                        break;
                 }
             }
         }
@@ -286,8 +317,8 @@ class Map {
         return this.sprites[y][x].visible;
     }
 
-    isVisibleForThing(x, y) {
-        return this.showThingsAlways || this.isVisible(x, y);
+    isVisibleThing(x, y) {
+        return this.showThingsAlways || this.showThingsPowerupActive || this.isVisible(x, y);
     }
 
     canSee(from, to) {

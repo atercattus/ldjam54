@@ -167,6 +167,38 @@ class Player extends Obj {
             }
         }
 
+        if (this.map.showThingsPowerupActive) {
+            if (--this.map.showThingsPowerupActive === 0) {
+                this.map.showThingsPowerupActive = undefined;
+            }
+        }
+
+        if (this.map.hideFoWPowerupActive) {
+            if (--this.map.hideFoWPowerupActive === 0) {
+                this.map.hideFoWPowerupActive = undefined;
+                game.showFogOfWar();
+            }
+        }
+
+        const powerup = sprite.__powerup;
+        if (powerup) {
+            const type = sprite.__powerupType;
+            sprite.__powerup = undefined;
+            sprite.__powerupType = undefined;
+            powerup.destroy();
+
+            switch (type) {
+                case TypePowerUpSee:
+                    this.map.showThingsPowerupActive = this.map.showThingsPowerupActiveMax;
+                    break;
+
+                case TypePowerUpLight:
+                    this.map.hideFoWPowerupActive = this.map.hideFoWPowerupActiveMax;
+                    game.hideFogOfWar();
+                    break;
+            }
+        }
+
         const thing = this.map.getThingByCoords(this.getCellCoords());
         if (thing) {
             if ((thing.type !== TypeDreamer) || (thing.inSearch)) {

@@ -57,7 +57,7 @@ class Thing extends Obj {
     }
 
     update(delta, playerDidStep) {
-        this.image.visible = this.map.isVisibleForThing(this.pos.x, this.pos.y);
+        this.image.visible = this.map.isVisibleThing(this.pos.x, this.pos.y);
 
         if (!playerDidStep) {
             return;
