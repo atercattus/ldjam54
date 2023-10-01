@@ -290,7 +290,7 @@ function startGame() {
                     chestBottomText.text = `You collected ${player.goldChestValue} gold out of ${map.goldTotalValue}. Press [F5] to try again :)`;
 
                     const elapsed = (new Date().getTime()) - startedAt;
-                    fetch(`https://ater.me/ldjam54stats?collected=${player.goldChestValue}_${map.goldTotalValue}&elap=${elapsed}&steps=${playerSteps}`);
+                    fetch(`https://ater.me/ldjam54stats?collected=${player.goldChestValue}_${map.goldTotalValue}&elap=${elapsed}&steps=${playerSteps}&dies=${player.dieCount}`);
                 }
                 break;
             default:

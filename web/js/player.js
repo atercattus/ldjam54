@@ -22,6 +22,8 @@ class Player extends Obj {
 
     minigameUI = {};
 
+    dieCount = 0;
+
     constructor(pos, map, parent, viewDistance) {
         const texture = PIXI.Texture.from('assets/characters.png');
 
@@ -217,6 +219,8 @@ class Player extends Obj {
             if (isInside) {
                 return;
             }
+
+            this.dieCount++;
 
             this.image.angle = 90;
             this.image.gotoAndStop(0);
