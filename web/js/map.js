@@ -77,7 +77,7 @@ class Map {
         const _ = 1;
         const map = [
             [_, _, 0, 0, _, _, _, _, _, _, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            [_, P, _, L, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, 0,],
+            [_, P, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, 0,],
             [0, 0, 0, _, 0, 0, _, _, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, D, 0,],
             [0, 0, 0, _, 0, 0, _, _, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _, 0,],
             [0, 0, 0, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, D, _, G, 0,],
@@ -92,7 +92,7 @@ class Map {
             [0, 0, _, _, 0, 0, _, _, 0, _, 0, 0, 0, 0, _, _, 0, 0, _, _, _, _, _, _,],
             [_, _, _, _, _, _, _, 0, 0, _, _, _, N, _, _, _, 0, 0, _, 0, _, _, 0, 0,],
             [_, _, _, _, _, _, _, 0, 0, 0, 0, 0, _, _, _, _, 0, 0, _, 0, _, _, 0, 0,],
-            [_, _, 0, 0, 0, 0, _, _, 0, 0, 0, 0, _, _, _, _, 0, 0, S, 0, _, _, 0, 0,],
+            [_, _, 0, 0, 0, 0, _, _, 0, 0, 0, 0, _, _, _, _, 0, 0, G, 0, _, _, 0, 0,],
             [_, _, 0, 0, 0, 0, _, _, 0, 0, 0, 0, _, _, _, _, 0, 0, 0, 0, _, _, 0, 0,],
             [_, D, 0, 0, _, _, _, _, _, _, 0, 0, _, _, _, _, 0, 0, 0, 0, _, _, 0, 0,],
             [_, _, 0, 0, _, _, _, _, _, _, 0, 0, _, _, _, _, 0, 0, 0, 0, _, _, 0, 0,],
@@ -235,6 +235,9 @@ class Map {
         }
 
         this.genRandomGold(this.goldTotalValue + 50);
+
+        this.genPowerup(TypePowerUpSee, this.powerUpSeeTex);
+        this.genPowerup(TypePowerUpLight, this.powerUpLightTex);
     }
 
     addGoldToGround(groundSprite, gi) {
@@ -254,22 +257,39 @@ class Map {
         while (this.goldTotalValue < totalCost) {
             const gi = Math.floor(Math.random() * 2);
 
-            let targetSprite;
-            while (true) {
-                const y = Math.floor(Math.random() * this.sprites.length);
-                const x = Math.floor(Math.random() * this.sprites[0].length);
-
-                if (!this.isEmpty(x, y)) {
-                    continue;
-                }
-                targetSprite = this.sprites[y][x];
-                if (targetSprite.__gold) {
-                    continue;
-                }
-                break;
-            }
+            const pos = this.getEmptyCell();
+            const targetSprite = this.sprites[pos.y][pos.x];
 
             this.addGoldToGround(targetSprite, gi);
+        }
+    }
+
+    genPowerup(type, tex) {
+        const pos = this.getEmptyCell();
+        const targetSprite = this.sprites[pos.y][pos.x];
+
+        const powerup = new PIXI.Sprite(tex);
+        powerup.anchor.set(0, 0);
+        powerup.y = targetSprite.height / 2;
+        targetSprite.addChild(powerup);
+        targetSprite.__powerup = powerup;
+        targetSprite.__powerupType = type;
+    }
+
+    getEmptyCell() {
+        while (true) {
+            const y = Math.floor(Math.random() * this.sprites.length);
+            const x = Math.floor(Math.random() * this.sprites[0].length);
+
+            if (!this.isEmpty(x, y)) {
+                continue;
+            }
+            const targetSprite = this.sprites[y][x];
+            if (targetSprite.__gold || targetSprite.__powerup) {
+                continue;
+            }
+
+            return new Pos(x, y);
         }
     }
 
