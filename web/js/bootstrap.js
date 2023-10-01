@@ -57,6 +57,9 @@ game.initApplication();
 
 const SCALE = 2;
 
+let menuTheme;
+let soundInGameTheme;
+
 let containerMap = new PIXI.Container();
 containerMap.sortableChildren = true; // for zIndex
 containerMap.scale.set(SCALE);
@@ -69,6 +72,18 @@ let playerPosFunc = function () {
 
 let map = new Map(containerMap, playerPosFunc);
 map.build(containerMap);
+
+const chestText = new PIXI.Text('LOL KEK [cheburek]', {
+    fontFamily: 'Arial',
+    fontSize: 24,
+    fill: 0xff1010,
+    align: 'center',
+});
+chestText.zIndex = 2;
+chestText.x = window.innerWidth / 2;
+chestText.y = window.innerHeight * 0.99;
+chestText.anchor.set(0.5, 1);
+chestText.visible = true;
 
 const playerViewDistance = 6;
 player = new Player(
@@ -99,22 +114,15 @@ scoreText.zIndex = 2;
 game.app.stage.addChild(scoreText);
 player.setScoreText();
 
-const doneText = new PIXI.Text('Press [Space] for finish', {
-    fontFamily: 'Arial',
-    fontSize: 24,
-    fill: 0xff1010,
-    align: 'center',
-});
-doneText.zIndex = 2;
-doneText.x = window.innerWidth / 2;
-doneText.y = window.innerHeight;
-doneText.anchor.set(0.5, 1);
-doneText.visible = false;
-game.app.stage.addChild(doneText);
+game.app.stage.addChild(chestText);
 
 let playerDidStep = false;
 
-let soundInGameTheme = PIXI.sound.Sound.from({url: 'assets/gameTheme.mp3', preload: true,});
+menuTheme = PIXI.sound.Sound.from({url: 'assets/menuTheme.mp3', preload: true,});
+menuTheme.volume = 0.5;
+menuTheme.loop = true;
+
+soundInGameTheme = PIXI.sound.Sound.from({url: 'assets/gameTheme.mp3', preload: true,});
 soundInGameTheme.volume = 0.5;
 soundInGameTheme.loop = true;
 setTimeout(() => {
@@ -146,9 +154,11 @@ document.addEventListener('keydown', (key) => {
             console.log(`show things is ${map.showThingsAlways ? 'on' : 'off'}`);
             break;
         case "Space":
-            if (player.goldChest > 0) {
+            player.minigameSpaceAction();
+
+            if (player.isInChestCell()) {
                 player.isMoveDisabled = true;
-                doneText.text = `You collected ${player.goldChest} gold out of ${map.goldTotal}. F5 for try again :)`;
+                chestText.text = `You collected ${player.goldChest} gold out of ${map.goldTotal}. Press [F5] to try again :)`;
             }
             break;
         default:
@@ -163,7 +173,6 @@ document.addEventListener('keydown', (key) => {
 game.app.ticker.add(() => {
     const delta = game.app.ticker.elapsedMS / 1000;
     player.update(delta);
-    //things.update(delta, playerDidStep);
     map.update(delta, playerDidStep);
 
     playerDidStep = false;

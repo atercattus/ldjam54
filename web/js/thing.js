@@ -4,6 +4,12 @@ const ViewDistances = {
     [TypeAggressive]: 9,
 };
 
+const ActionSizes = {
+    [TypeDreamer]: 12,
+    [TypeNormal]: 15,
+    [TypeAggressive]: 7,
+};
+
 let counter = 1;
 
 class Thing extends Obj {
