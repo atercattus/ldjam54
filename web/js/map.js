@@ -17,7 +17,7 @@ class Map {
     chestTex;
     goldTextures;
 
-    map = {};
+    mapInfo = {};
     container;
 
     sprites = [];
@@ -110,12 +110,12 @@ class Map {
     }
 
     build(container) {
-        this.map = this.gen();
+        this.mapInfo = this.gen();
         this.container = container;
 
-        const scheme = this.map.map;
-        const rows = this.map.rows;
-        const cols = this.map.cols;
+        const scheme = this.mapInfo.map;
+        const rows = this.mapInfo.rows;
+        const cols = this.mapInfo.cols;
 
         this.sprites = [];
         for (let y = 0; y <= rows + 1; y++) {
@@ -168,8 +168,8 @@ class Map {
 
                 switch (type) {
                     case TypePlayer:
-                        this.map.start.x = x + 1;
-                        this.map.start.y = y + 1;
+                        this.mapInfo.start.x = x + 1;
+                        this.mapInfo.start.y = y + 1;
 
                         const chest = new PIXI.Sprite(this.chestTex);
                         chest.anchor.set(0, 0);
@@ -228,14 +228,14 @@ class Map {
     isEmpty(x, y) {
         x = Math.round(x);
         y = Math.round(y);
-        if (x <= 0 || x > this.map.cols) {
+        if (x <= 0 || x > this.mapInfo.cols) {
             return false;
         }
-        if (y <= 0 || y > this.map.rows) {
+        if (y <= 0 || y > this.mapInfo.rows) {
             return false;
         }
 
-        const type = this.map.map[y - 1][x - 1];
+        const type = this.mapInfo.map[y - 1][x - 1];
         if (type === TypeWall) {
             return false;
         }
@@ -245,10 +245,10 @@ class Map {
     isVisible(x, y) {
         x = Math.round(x);
         y = Math.round(y);
-        if (x <= 0 || x > this.map.cols) {
+        if (x <= 0 || x > this.mapInfo.cols) {
             return false;
         }
-        if (y <= 0 || y > this.map.rows) {
+        if (y <= 0 || y > this.mapInfo.rows) {
             return false;
         }
         return this.sprites[y][x].visible;

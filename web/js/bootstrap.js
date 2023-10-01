@@ -69,7 +69,7 @@ map.build(containerMap);
 
 const playerViewDistance = 6;
 player = new Player(
-    new Pos(map.map.start.x, map.map.start.y),
+    new Pos(map.mapInfo.start.x, map.mapInfo.start.y),
     map,
     containerMap,
     playerViewDistance,
@@ -80,8 +80,8 @@ containerMap.y = (window.innerHeight / 2) - player.image.y;
 
 game.buildFogOfWar(
     new Pos(
-        map.idx2X(map.map.start.x) + containerMap.x,
-        map.idx2Y(map.map.start.y) + containerMap.y,
+        map.idx2X(map.mapInfo.start.x) + containerMap.x,
+        map.idx2Y(map.mapInfo.start.y) + containerMap.y,
     ),
     game.app.stage
 );

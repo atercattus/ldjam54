@@ -74,7 +74,7 @@ class Player extends Obj {
 
     update(delta) {
         // chest cell?
-        if (this.map.map.start.x === this.pos.x && this.map.map.start.y === this.pos.y) {
+        if (this.map.mapInfo.start.x === this.pos.x && this.map.mapInfo.start.y === this.pos.y) {
             if (this.goldInv > 0) {
                 if (this.playCoinSound()) {
                     this.goldChest++;
@@ -151,7 +151,7 @@ class Player extends Obj {
         setTimeout(() => {
             this.isMoveDisabled = false;
 
-            const startPos = this.map.map.start;
+            const startPos = this.map.mapInfo.start;
             const dx = this.pos.x - startPos.x;
             const dy = this.pos.y - startPos.y;
 
