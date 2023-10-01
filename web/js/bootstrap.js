@@ -26,11 +26,12 @@ class Game {
     }
 
     buildFogOfWar(pos, parent) {
-        const half = 256; // half of texture size
+        const half = 256 * SCALE; // half of texture size
         this.fowGradient = PIXI.Sprite.from('assets/gradient.png');
         this.fowGradient.anchor.set(0.5);
         this.fowGradient.x = pos.x;
         this.fowGradient.y = pos.y;
+        this.fowGradient.scale.set(SCALE);
         this.app.stage.addChild(this.fowGradient);
 
         this.fowBorders = new PIXI.Graphics();
@@ -54,9 +55,11 @@ class Game {
 const game = new Game();
 game.initApplication();
 
+const SCALE = 2;
+
 let containerMap = new PIXI.Container();
 containerMap.sortableChildren = true; // for zIndex
-//containerMap.scale.set(2);
+containerMap.scale.set(SCALE);
 game.app.stage.addChild(containerMap);
 
 let player;
@@ -75,13 +78,13 @@ player = new Player(
     playerViewDistance,
 );
 
-containerMap.x = (window.innerWidth / 2) - player.image.x;
-containerMap.y = (window.innerHeight / 2) - player.image.y;
+containerMap.x = (window.innerWidth / 2) - player.image.x * SCALE;
+containerMap.y = (window.innerHeight / 2) - player.image.y * SCALE;
 
 game.buildFogOfWar(
     new Pos(
-        map.idx2X(map.mapInfo.start.x) + containerMap.x,
-        map.idx2Y(map.mapInfo.start.y) + containerMap.y,
+        map.idx2X(map.mapInfo.start.x) * SCALE + containerMap.x,
+        map.idx2Y(map.mapInfo.start.y) * SCALE + containerMap.y,
     ),
     game.app.stage
 );

@@ -60,8 +60,8 @@ class Player extends Obj {
 
         this.movingTo = new Pos(newX, newY);
         this.parentMovingTo = new Pos(
-            this.image.parent.x - dx * this.map.CellW,
-            this.image.parent.y - dy * this.map.CellH,
+            this.image.parent.x - SCALE * dx * this.map.CellW,
+            this.image.parent.y - SCALE * dy * this.map.CellH,
         );
         this.movingDuration = 0.25;
         if (dx === 0 && dy !== 0) {
@@ -110,8 +110,8 @@ class Player extends Obj {
 
         this.moveBy(dx, dy);
 
-        this.image.parent.x -= dx * this.map.CellW;
-        this.image.parent.y -= dy * this.map.CellH;
+        this.image.parent.x -= SCALE * dx * this.map.CellW;
+        this.image.parent.y -= SCALE * dy * this.map.CellH;
     }
 
     processNewCell() {
@@ -158,8 +158,8 @@ class Player extends Obj {
             this.moveTo(startPos.x, startPos.y);
             this.logicPos = startPos.y;
 
-            this.image.parent.x += dx * this.map.CellW;
-            this.image.parent.y += dy * this.map.CellH;
+            this.image.parent.x += SCALE * dx * this.map.CellW;
+            this.image.parent.y += SCALE * dy * this.map.CellH;
 
             map.showNear(this.pos, this.viewDistance);
         }, 1000);
