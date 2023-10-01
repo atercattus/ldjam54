@@ -1,6 +1,9 @@
 class Player extends Obj {
     viewDistance;
 
+    waitTextures;
+    walkTextures;
+
     movingTo;
     parentMovingTo;
     movingSpeed;
@@ -22,17 +25,27 @@ class Player extends Obj {
     constructor(pos, map, parent, viewDistance) {
         const texture = PIXI.Texture.from('assets/characters.png');
 
-        const sprite = new PIXI.AnimatedSprite([
+        const walkTextures = [
             new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 32 * 4, 32, 32)),
             new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(32, 32 * 4, 32, 32)),
-        ]);
+        ];
+        const waitTextures = [
+            new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(0, 32 * 4, 32, 32)),
+            new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(32 * 2, 32 * 4, 32, 32)),
+        ];
+
+        const sprite = new PIXI.AnimatedSprite(waitTextures);
         sprite.anchor.set(0.5, 0.5);
         sprite.zIndex = 1;
-        sprite.animationSpeed = 0.15;
-        //sprite.play();
+        sprite.animationSpeed = 0.03;
         parent.addChild(sprite);
 
         super(pos, map, sprite);
+
+        this.waitTextures = waitTextures;
+        this.walkTextures = walkTextures;
+
+        this.switchWalk(false);
 
         this.soundCoin = PIXI.sound.Sound.from({url: 'assets/coin.mp3', preload: true,});
         this.soundCoin.volume = 0.5;
@@ -51,6 +64,13 @@ class Player extends Obj {
         map.showNear(this.pos, this.viewDistance);
     }
 
+    switchWalk(walk) {
+        this.image.animationSpeed = walk ? 0.3 : 0.03;
+        this.image.textures = walk ? this.walkTextures : this.waitTextures;
+
+        this.image.gotoAndPlay(0);
+    }
+
     moveByCell(dx, dy) {
         if (this.movingTo || this.isMoveDisabled) {
             return false;
@@ -63,7 +83,7 @@ class Player extends Obj {
             return false;
         }
 
-        this.image.gotoAndPlay(1);
+        this.switchWalk(true);
         if (dx !== 0) {
             this.image.scale.x = (dx > 0) ? 1 : -1;
         }
@@ -113,7 +133,7 @@ class Player extends Obj {
 
             map.showNear(this.pos, this.viewDistance);
             this.movingTo = undefined;
-            this.image.gotoAndStop(2);
+            this.switchWalk(false);
             this.processNewCell();
             return;
         }

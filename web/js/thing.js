@@ -5,12 +5,10 @@ const ViewDistances = {
 };
 
 const ActionSizes = {
-    [TypeDreamer]: 12,
-    [TypeNormal]: 10,
-    [TypeAggressive]: 6,
+    [TypeDreamer]: 10,
+    [TypeNormal]: 8,
+    [TypeAggressive]: 5,
 };
-
-let counter = 1;
 
 class Thing extends Obj {
     type;
@@ -47,7 +45,6 @@ class Thing extends Obj {
         if (type !== TypeDreamer) {
             sprite.play();
         }
-        this.name = `t#${counter++}`;
 
         this.type = type;
         this.sprite = sprite;
