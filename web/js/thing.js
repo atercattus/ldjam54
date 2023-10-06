@@ -21,9 +21,7 @@ class Thing extends Obj {
     gotoPos;
     moveTimer;
 
-    dreamerWakeupInterval = undefined;
-
-    cooldown = false;
+    cooldown = 0;
 
     constructor(things, type, pos, map, parent, playerPosFunc, sprite) {
         let viewDistance = ViewDistances[type];
@@ -64,17 +62,8 @@ class Thing extends Obj {
         }
 
         if (this.cooldown) {
-            this.cooldown = false;
+            this.cooldown--;
             return;
-        }
-
-        if (this.dreamerWakeupInterval > 0) {
-            if (--this.dreamerWakeupInterval <= 0) {
-                // angry mode :)
-                //console.log(this.name, 'dreamer is here!');
-                //this.dreamerWakeupInterval = undefined;
-                //this.viewDistance = ViewDistances[TypeNormal];
-            }
         }
 
         const playerPos = this.playerPosFunc();
@@ -91,25 +80,25 @@ class Thing extends Obj {
         } else if (see) {
             //console.log(this.name, 'see!');
             if (this.type === TypeDreamer) {
-                if (this.dreamerWakeupInterval === undefined) {
+                if (!this.cooldown && (this.viewDistance === ViewDistances[TypeDreamer])) {
                     //console.log(this.name, 'dreamer wake up...');
                     this.sprite.play();
                     this.viewDistance = ViewDistances[TypeNormal];
-                    this.dreamerWakeupInterval = 2;
+                    this.cooldown = 2;
                     return;
                 } else {
                     //console.log(this.name, 'dreamer warming up...');
                 }
             }
+            //console.log(this.name, 'in search...');
             this.inSearch = true;
             this.gotoPos = playerPos;
         } else {
             if (!this.gotoPos) {
-                if ((this.type === TypeDreamer) && (this.dreamerWakeupInterval !== undefined)) {
+                if ((this.type === TypeDreamer) && (this.viewDistance !== ViewDistances[TypeDreamer])) {
                     //console.log(this.name, 'dreamer calm down...');
                     this.sprite.stop();
                     this.viewDistance = ViewDistances[TypeDreamer];
-                    this.dreamerWakeupInterval = undefined;
                     return;
                 }
 

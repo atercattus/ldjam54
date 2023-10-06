@@ -215,7 +215,7 @@ class Player extends Obj {
         const size = ActionSizes[thing.type];
 
         this.showMinigame(size, (isInside) => {
-            thing.cooldown = true;
+            thing.cooldown = 1;
             if (isInside) {
                 this.enableMove();
                 return;
