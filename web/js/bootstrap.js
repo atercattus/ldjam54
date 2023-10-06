@@ -261,6 +261,27 @@ function startGame() {
         if (!gamepads || !gamepads[0]) {
             return;
         }
+
+        // X axis
+        for (let i = 0; i < 4; i += 2) {
+            const val = gamepads[0].axes[i];
+            if (Math.abs(val) > 0.9) {
+                const key = (val < 0) ? 'ArrowLeft' : 'ArrowRight';
+                const event = new KeyboardEvent('keydown', {code: key});
+                document.dispatchEvent(event);
+            }
+        }
+
+        // Y axis
+        for (let i = 1; i < 4; i += 2) {
+            const val = gamepads[0].axes[i];
+            if (Math.abs(val) > 0.9) {
+                const key = (val < 0) ? 'ArrowUp' : 'ArrowDown';
+                const event = new KeyboardEvent('keydown', {code: key});
+                document.dispatchEvent(event);
+            }
+        }
+
         const gamepad = gamepads[0].buttons;
 
         for (let i = 0; i < gamepad.length; i++) {
