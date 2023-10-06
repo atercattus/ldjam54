@@ -59,7 +59,7 @@ class Player extends Obj {
 
         this.buildMinigameUI(sprite);
 
-        chestBottomText.text = 'Press [Enter] for finish... if you want';
+        chestBottomText.text = 'Press [Enter] or [joy X] for finish... if you want';
         chestBottomText.visible = false;
 
         map.hideAllCells();
@@ -328,7 +328,8 @@ class Player extends Obj {
         sprite.addChild(line);
 
         // text
-        const text = new PIXI.Text(`To avoid the attack, press [Space]\nwhen line is in central zone\n\nPress [Space] to start`, {
+        const btn = `[Space] or [joy A]`
+        const text = new PIXI.Text(`To avoid the attack, press ${btn}\nwhen line is in central zone\n\nPress ${btn} to start`, {
             fontFamily: 'Arial',
             fontSize: 12,
             fill: 0xffffff,

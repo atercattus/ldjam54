@@ -231,9 +231,9 @@ function startMenu() {
         startGame();
     });
 
-    setTimeout(() => {
-        menuTheme.play();
-    }, 500)
+    // setTimeout(() => {
+    //     menuTheme.play();
+    // }, 500)
 }
 
 function startGame() {
@@ -246,7 +246,41 @@ function startGame() {
     menuTheme.stop();
     soundInGameTheme.play();
 
+    const gamepadPressed = {};
+    const gamepadMapping = {
+        [0]: 'Space', // A
+        [2]: 'Enter', // X
+        [12]: 'ArrowUp',
+        [13]: 'ArrowDown',
+        [14]: 'ArrowLeft',
+        [15]: 'ArrowRight',
+    };
+
+    function processGamepads() {
+        const gamepads = navigator.getGamepads();
+        if (!gamepads || !gamepads[0]) {
+            return;
+        }
+        const gamepad = gamepads[0].buttons;
+
+        for (let i = 0; i < gamepad.length; i++) {
+            if (!gamepad[i].pressed) {
+                gamepadPressed[i] = false;
+                continue;
+            }
+
+            if (!gamepadPressed[i]) {
+                gamepadPressed[i] = true;
+                const key = gamepadMapping[i];
+                const event = new KeyboardEvent('keydown', {code: key});
+                document.dispatchEvent(event);
+            }
+        }
+    }
+
     game.app.ticker.add(() => {
+        processGamepads();
+
         const delta = game.app.ticker.elapsedMS / 1000;
         player.update(delta);
         map.update(delta, playerDidStep);
