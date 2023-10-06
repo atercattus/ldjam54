@@ -286,7 +286,8 @@ function startGame() {
                 break;
             case "Enter":
                 if (player.isInChestCell()) {
-                    player.isMoveDisabled = true;
+                    player.disableMove();
+
                     chestBottomText.text = `You collected ${player.goldChestValue} gold out of ${map.goldTotalValue}. Press [F5] to try again :)`;
 
                     const elapsed = (new Date().getTime()) - startedAt;

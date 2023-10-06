@@ -210,13 +210,14 @@ class Player extends Obj {
     }
 
     catched(thing) {
-        this.isMoveDisabled = true;
+        this.disableMove();
 
         const size = ActionSizes[thing.type];
 
         this.showMinigame(size, (isInside) => {
             thing.cooldown = true;
             if (isInside) {
+                this.enableMove();
                 return;
             }
 
@@ -233,7 +234,7 @@ class Player extends Obj {
             this.soundHitHurt.play();
 
             setTimeout(() => {
-                this.isMoveDisabled = false;
+                this.enableMove();
 
                 this.image.angle = 0;
                 this.switchWalk(false);
@@ -401,13 +402,11 @@ class Player extends Obj {
         ui.speed = speed;
         ui.cb = cb;
 
-        this.isMoveDisabled = true;
+        this.disableMove();
     }
 
     hideMinigame() {
         const ui = this.minigameUI;
-
-        this.isMoveDisabled = false;
 
         if (menuTheme) {
             menuTheme.stop();
@@ -461,7 +460,15 @@ class Player extends Obj {
 
     minigameProcessInside(isInside) {
         this.soundHitHurt.play();
-        this.minigameUI.cb(isInside);
         this.hideMinigame();
+        this.minigameUI.cb(isInside);
+    }
+
+    disableMove() {
+        this.isMoveDisabled = true;
+    }
+
+    enableMove() {
+        this.isMoveDisabled = false;
     }
 }
