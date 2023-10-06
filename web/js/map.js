@@ -334,7 +334,7 @@ class Map {
         if (y <= 0 || y > this.mapInfo.rows) {
             return false;
         }
-        return this.sprites[y][x].visible;
+        return this.sprites[y][x].visible && (this.sprites[y][x].alpha >= 0.9);
     }
 
     isVisibleThing(x, y) {
@@ -379,7 +379,9 @@ class Map {
 
     hideVisibleCells() {
         for (let i = 0; i < this.visibleCells.length; i++) {
-            this.hideCell(this.visibleCells[i]);
+            //this.hideCell(this.visibleCells[i]);
+            const sprite = this.visibleCells[i];
+            sprite.alpha = 0.2;
         }
         this.visibleCells = [];
     }
@@ -387,6 +389,7 @@ class Map {
     showCell(sprite) {
         sprite.visible = true;
         this.visibleCells.push(sprite);
+        return sprite;
     }
 
     hideCell(sprite) {
@@ -443,7 +446,7 @@ class Map {
                 queue.push({energy: p.energy - 1, pos: newPos});
             }
 
-            this.showCell(this.sprites[p.pos.y][p.pos.x]);
+            this.showCell(this.sprites[p.pos.y][p.pos.x]).alpha = 1;
         }
     }
 
